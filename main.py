@@ -31,8 +31,9 @@ class runner:
             while queue.full():
                 # if queue is full, wait for a bit
                 await asyncio.sleep(0.1)
-
             
+            # get something from dsn
+            DSNQuery
 
             # now add that object to the queue
             await self.queue.put(obj)
