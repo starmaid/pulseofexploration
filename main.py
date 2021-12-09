@@ -25,7 +25,6 @@ class runner:
         # this thread manages reading the file.
         # we only have so much memory on a control board (like 64k)
         # so we cannot load the entire file.
-        totalLines = 0
 
         while True:
             while queue.full():
@@ -36,8 +35,7 @@ class runner:
             DSNQuery
 
             # now add that object to the queue
-            await self.queue.put(obj)
-            totalLines += 1
+            await self.queue.put()
 
         # put the "end job object in the queue
         await self.queue.put(endJob())

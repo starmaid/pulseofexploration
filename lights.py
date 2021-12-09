@@ -4,13 +4,13 @@ import asyncio
 class lightDriver:
     """Handles sending commands over the PWM pin to the lights
     Manages timing and stuff"""
-    
+
     def __init__(self, cmd):
         return
 
     async def execute(self, prev):
 
-        await asyncio.sleep(time)
+        await asyncio.sleep()
         return True
 
 
