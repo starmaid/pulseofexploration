@@ -3,10 +3,12 @@ import requests
 from datetime import datetime
 
 class DSNQuery:
-    """Can pull from the DSN network thing"""
+    """Handles data queries from NASA DSN"""
 
     def __init__(self):
+        self.comms = {}
         self.getFriendlyNames()
+
 
     def getFriendlyNames(self):
         # get friendly names
@@ -15,7 +17,6 @@ class DSNQuery:
         # make dict of friendlynames
         allships = friendlynames.findall("./spacecraftMap/spacecraft")
         self.friendlyTranslator = {}
-        #self.friendlyTranslator = {'dss': 'Debug', 'test': 'Testing'}
 
         for ship in allships:
             self.friendlyTranslator[ship.attrib['name']] = ship.attrib['friendlyName']
@@ -63,12 +64,13 @@ class DSNQuery:
                 continue
             
             sDict['range'] = float(target.attrib['uplegRange']) # in km
+            sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
             signals[name] = sDict
 
         
         #print(signals)
         # remove things we dont care about
-        for i in ["dss", "test", "testing", "Testing"]:
+        for i in ["dsn", "dss", "test", "testing", "Testing"]:
             try:
                 signals.pop(i)
             except:

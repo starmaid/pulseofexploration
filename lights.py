@@ -1,25 +1,30 @@
 # This file controls the low level light stuff
 import asyncio
 
-class lightDriver:
+class LightSequence:
     """Handles sending commands over the PWM pin to the lights
     Manages timing and stuff"""
 
     def __init__(self, cmd):
         return
 
-    async def execute(self, prev):
+    def setDistance(self):
+        return
 
-        await asyncio.sleep()
-        return True
+    def setStrength(self):
+        return
+
+    def run(self):
+        return 
 
 
-# have a class for all animations that we can inherit?
 
-# Have a class for each animation? that way we can send characteristics
-# of a dsn query and it will be supre easy
 
-class idle:
+class Mars(LightSequence):
     def __init__(self):
         return
+
+    def run(self):
+        return
+    
     
