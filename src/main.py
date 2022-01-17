@@ -1,11 +1,12 @@
 import asyncio
+from inspect import getargs
 import json
 
 #import board
 #import neopixel
 
-from dsn import *
-from lights import *
+import dsn
+import lights
 
 
 class Pulse:
@@ -47,7 +48,7 @@ class Pulse:
         and places new light patterns in the queue
         reads when the dsn sends a stop item, sends it to lights, and ends."""
 
-        q = DSNQuery()
+        q = dsn.DSNQuery()
         
         running = True
 
@@ -58,14 +59,23 @@ class Pulse:
                 if len(newsignals) > 0:
                     # put the new objects in
                     for s in newsignals:
-                        self.queue.put()
+                        newSequence = None
+                        if s['name'] in self.config['ships'].keys():
+                            locname = self.config['ships'][s['name']]
+                            classname = getattr(lights,locname)
+                            newSequence = classname(self.lights,self.sky)
+
+                        else:
+                            newSequence = lights.DeepSpace(self.lights,self.sky)
+
+                        self.queue.put(newSequence)
 
                 asyncio.sleep(5)
                 
             except KeyboardInterrupt:
                 # Add the stop object
                 running = False
-                self.queue.put(Stop())
+                self.queue.put(lights.Stop())
 
 
         # now add that object to the queue
@@ -84,9 +94,9 @@ class Pulse:
         """
 
         # set the startup running sequences
-        self.activeSequences = [Ground(self.lights,self.ground), 
-                            Idle(self.lights,self.signal), 
-                            IdleSky(self.lights,self.sky)]
+        self.activeSequences = [lights.Ground(self.lights,self.ground), 
+                            lights.Idle(self.lights,self.signal), 
+                            lights.IdleSky(self.lights,self.sky)]
 
 
         #prev = await queue.get()

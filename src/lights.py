@@ -42,6 +42,12 @@ class IdleSky(LightSequence):
         super().__init__(lights, lRange)
     
 
+class DeepSpace(LightSequence):
+    """deep space twinkle"""
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
+    
+
 class Ground(LightSequence):
     """The ground. can add functionality, but for now is green and blue"""
 
