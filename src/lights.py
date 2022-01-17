@@ -18,6 +18,12 @@ class LightSequence:
         return 
 
 
+class Idle(LightSequence):
+    def __init__(self, cmd):
+        return
+        
+    def run(self):
+        return 
 
 
 class Mars(LightSequence):

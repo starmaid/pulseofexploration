@@ -37,6 +37,9 @@ class DSNQuery:
         signals = {}
 
         """
+        # this part looks at signals between dishes and probes
+        # look at this later to see if you want to look at frequency and power
+        # for now, its omitted because i dont want to do it.
         for signal in comms.findall("./dish/upSignal") + comms.findall("./dish/downSignal"):
             sDict = {}
             name = signal.attrib['spacecraft']
@@ -81,22 +84,6 @@ class DSNQuery:
         ts = int(comms.findall("timestamp")[0].text) / 1000
         timestring = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
-
-        outString = "```python\n<./> " + timestring + " UTC <./>\n"
-
-        for item in signals:
-            outString += signals[item]['friendlyName'].ljust(12)
-            #if  signals[item]['power'] != "":
-            #    outString += " (" + signals[item]['power'] + " dB)"
-            
-            if signals[item]['range'] != -1:
-                outString += " (" + str(signals[item]['range']) + " km)"
-            
-            
-            outString += "\n"
-
-        outString += "```"
-
-        return outString
+        return
 
 
