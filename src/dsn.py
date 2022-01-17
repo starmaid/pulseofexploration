@@ -6,7 +6,7 @@ class DSNQuery:
     """Handles data queries from NASA DSN"""
 
     def __init__(self):
-        self.comms = {}
+        self.activeSignals = {}
         self.getFriendlyNames()
 
 
@@ -80,10 +80,26 @@ class DSNQuery:
                 pass
         #print(signals)
         
+        # do we care about timestamps?
+        #ts = int(comms.findall("timestamp")[0].text) / 1000
+        #timestring = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        
+        return signals
 
-        ts = int(comms.findall("timestamp")[0].text) / 1000
-        timestring = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-
-        return
-
+    def getNew(self):
+        signals = self.poll()
+        newsignals = []
+        
+        # Add new signal we just saw to the active ones
+        for s in signals:
+            if s not in self.activeSignals:
+                newsignals.append(s)
+                self.activeSignals["name"] = s
+        
+        # Remove signal if it is no longer active
+        for s in self.activeSignals:
+            if s not in signals:
+                self.activeSignals.popitem["name"]
+        
+        return newsignals
 

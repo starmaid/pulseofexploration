@@ -1,0 +1,13 @@
+{
+    "lights": {
+        "ground": 10,
+        "signal": 10,
+        "sky": 10,
+        "rgb": true,
+        "groundFirst": true
+    },
+    "ships": {
+        "shortname": "planet",
+        "shortname2": "planet"
+    }
+}

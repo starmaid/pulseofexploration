@@ -2,35 +2,58 @@
 import asyncio
 
 class LightSequence:
-    """Handles sending commands over the PWM pin to the lights
-    Manages timing and stuff"""
+    """controls what colors are sent to the array of pixels"""
 
-    def __init__(self, cmd):
-        return
-
-    def setDistance(self):
-        return
-
-    def setStrength(self):
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        self.lights = lights
+        self.lRange = lRange
+        self.distance = distance
+        self.strength = strength
+        self.stop = False
         return
 
     def run(self):
-        return 
+        return True
 
+class Stop():
+    def __init__(self) -> None:
+        self.stop = True
+        pass
+
+    def run(self):
+        return False
+
+    
 
 class Idle(LightSequence):
-    def __init__(self, cmd):
-        return
-        
+    """Sequence that turns the lights off."""
+
+    def __init__(self, lights, lRange):
+        super().__init__(lights, lRange)
+
     def run(self):
         return 
+
+
+class IdleSky(LightSequence):
+    """Twinkling stars for the idle sky"""
+
+    def __init__(self, lights, lRange):
+        super().__init__(lights, lRange)
+    
+
+class Ground(LightSequence):
+    """The ground. can add functionality, but for now is green and blue"""
+
+    def __init__(self, lights, lRange):
+        super().__init__(lights, lRange)
+    
 
 
 class Mars(LightSequence):
-    def __init__(self):
-        return
+    def __init__(self, lights, lRange):
+        super().__init__(lights, lRange)
 
-    def run(self):
-        return
+
     
     

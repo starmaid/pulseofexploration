@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 #import board
 #import neopixel
@@ -9,12 +10,16 @@ from lights import *
 
 class Pulse:
     def __init__(self,numLeds):
+        # Load the config file with ship/planet associations
+        with open("../data/config.json","r") as f:
+            self.config = json.load(f)
+
         """Sets up the lights array and the async queue"""
         #ORDER = neopixel.GRB
         #self.lights = neopixel.NeoPixel(board.D18, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
         self.lights = [(0,0,0)] * sum(numLeds)
 
-        # ranges for each section so we can pass them to sequences
+        # tuple ranges for each section so we can pass them to sequences
         self.ground = (0, numLeds[0]-1)
         self.signal = (numLeds[0], numLeds[0]+numLeds[1]-1)
         self.sky = (numLeds[0]+numLeds[1], sum(numLeds)-1)
@@ -42,6 +47,27 @@ class Pulse:
         and places new light patterns in the queue
         reads when the dsn sends a stop item, sends it to lights, and ends."""
 
+        q = DSNQuery()
+        
+        running = True
+
+        while running:
+            try:
+                newsignals = q.getNew()
+
+                if len(newsignals) > 0:
+                    # put the new objects in
+                    for s in newsignals:
+                        self.queue.put()
+
+                asyncio.sleep(5)
+                
+            except KeyboardInterrupt:
+                # Add the stop object
+                running = False
+                self.queue.put(Stop())
+
+
         # now add that object to the queue
         # await self.queue.put()
 
@@ -57,17 +83,33 @@ class Pulse:
         reads a stop item in the queue and ends
         """
 
-        prev = await queue.get()
+        # set the startup running sequences
+        self.activeSequences = [Ground(self.lights,self.ground), 
+                            Idle(self.lights,self.signal), 
+                            IdleSky(self.lights,self.sky)]
+
+
+        #prev = await queue.get()
         running = True
 
         while running:
             # reads the commands in the queue
             # if the queue is currently empty, it will wait for the next item to be added.
             obj = await queue.get()
-            if obj is None:
+            if obj is not None:
+                if obj.stop:
+                    running = False
+                    self.activeSequences = [obj,obj,obj]
+                else:
+                    
+                    # set the sky as the new sky
+                    # set the signal parameters and add
+                    pass
                 continue
-
-            asyncio.sleep(0.1)
+            
+            # Because this is just placing different objects in the queue
+            # It can run at a lower clock speed than the framerate
+            asyncio.sleep(1)
         return
 
     async def runLights(self, queue):
@@ -84,11 +126,13 @@ class Pulse:
 
     def updateSequences(self):
         """tells each of the active sequenecs to update their lights"""
-        pass
-    
-    async def stop(self):
-        """calls the stop function in dsn to cascade everything off"""
-        pass
+        
+        running = True
+        
+        for s in self.activeSequences:
+            running = s.run()
+        
+        return running
 
     
 # This is the section of the program that runs when executed
