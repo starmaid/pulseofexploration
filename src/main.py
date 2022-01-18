@@ -1,4 +1,5 @@
 import asyncio
+from email.mime import image
 from inspect import getargs
 import json
 
@@ -111,11 +112,10 @@ class Pulse:
                     running = False
                     self.activeSequences = [obj,obj,obj]
                 else:
-                    
+                    self.activeSequences[2] = obj
+                    self.activeSequences[1] = lights.Transmission()
                     # set the sky as the new sky
                     # set the signal parameters and add
-                    pass
-                continue
             
             # Because this is just placing different objects in the queue
             # It can run at a lower clock speed than the framerate
@@ -128,21 +128,25 @@ class Pulse:
         running = True
 
         while running:
-            running = self.updateSequences()
+            if self.activeSequences[0].stop:
+                running = False
+                break
+            
+            # The ground should never end LOL
+            self.activeSequences[0].run()
+
+            cont = self.activeSequences[1].run()
+            if not cont:
+                self.activeSequences[1] = lights.Idle()
+            
+            cont = self.activeSequences[2].run()
+            if not cont:
+                self.activeSequences[2] = lights.IdleSky()
+            
             asyncio.sleep(0.1)
             self.lights.show()
         return
     
-
-    def updateSequences(self):
-        """tells each of the active sequenecs to update their lights"""
-        
-        running = True
-        
-        for s in self.activeSequences:
-            running = s.run()
-        
-        return running
 
     
 # This is the section of the program that runs when executed

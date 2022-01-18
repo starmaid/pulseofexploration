@@ -13,7 +13,9 @@ class LightSequence:
         return
 
     def run(self):
-        return True
+        """Run should return true until the animation is done playing"""
+        return
+
 
 class Stop():
     def __init__(self) -> None:
@@ -28,18 +30,28 @@ class Stop():
 class Idle(LightSequence):
     """Sequence that turns the lights off."""
 
-    def __init__(self, lights, lRange):
-        super().__init__(lights, lRange)
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
 
     def run(self):
         return 
 
 
+class Transmission(LightSequence):
+    """Sequence that plays for the signal"""
+
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
+    
+    def run(self):
+        return
+
+
 class IdleSky(LightSequence):
     """Twinkling stars for the idle sky"""
 
-    def __init__(self, lights, lRange):
-        super().__init__(lights, lRange)
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
     
 
 class DeepSpace(LightSequence):
@@ -51,15 +63,14 @@ class DeepSpace(LightSequence):
 class Ground(LightSequence):
     """The ground. can add functionality, but for now is green and blue"""
 
-    def __init__(self, lights, lRange):
-        super().__init__(lights, lRange)
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
     
 
 
 class Mars(LightSequence):
-    def __init__(self, lights, lRange):
-        super().__init__(lights, lRange)
-
+    def __init__(self, lights, lRange, distance=None, strength=None):
+        super().__init__(lights, lRange, distance, strength)
 
     
     
