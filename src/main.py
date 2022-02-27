@@ -1,6 +1,4 @@
 import asyncio
-from email.mime import image
-from inspect import getargs
 import json
 
 #import board
@@ -77,13 +75,6 @@ class Pulse:
                 # Add the stop object
                 running = False
                 self.queue.put(lights.Stop())
-
-
-        # now add that object to the queue
-        # await self.queue.put()
-
-        # put the "end job object in the queue
-        # await self.queue.put(endJob())
         return
 
     async def runSequenceQueue(self, queue):

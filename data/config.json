@@ -7,7 +7,8 @@
         "groundFirst": true
     },
     "ships": {
-        "shortname": "planet",
-        "shortname2": "planet"
+        "vgr1": "DeepSpace",
+        "vgr2": "DeepSpace",
+        "msl": "Mars"
     }
 }
