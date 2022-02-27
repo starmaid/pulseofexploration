@@ -22,7 +22,7 @@ sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
 
 # set config in ./data/config.json easily
-
+# sed something
 
 # Set up a daemon or autorun
 # crontab -e
