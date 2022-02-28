@@ -11,7 +11,7 @@ import lights
 class Pulse:
     def __init__(self,numLeds):
         # Load the config file with ship/planet associations
-        with open("../data/config.json","r") as f:
+        with open("./data/config.json","r") as f:
             self.config = json.load(f)
 
         """Sets up the lights array and the async queue"""
@@ -35,8 +35,9 @@ class Pulse:
 
     async def start(self):
         """start both threads, and wait for them to finish before ending."""
+        # self.runDsn(self.queue),
         await asyncio.gather(
-            self.runDsn(self.queue),
+            
             self.runSequenceQueue(self.queue),
             self.runLights(self.queue)
             )
@@ -88,7 +89,7 @@ class Pulse:
         # set the startup running sequences
         self.activeSequences = [lights.Ground(self.lights,self.ground), 
                             lights.Idle(self.lights,self.signal), 
-                            lights.IdleSky(self.lights,self.sky)]
+                            lights.Mars(self.lights,self.sky)]
 
 
         #prev = await queue.get()
@@ -134,8 +135,8 @@ class Pulse:
             if not cont:
                 self.activeSequences[2] = lights.IdleSky()
             
-            asyncio.sleep(0.1)
-            self.lights.show()
+            await asyncio.sleep(0.1)
+            # self.lights.show()
         return
     
 
