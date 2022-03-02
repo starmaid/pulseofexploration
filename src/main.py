@@ -129,12 +129,13 @@ class Pulse:
 
             cont = self.activeSequences[1].run()
             if not cont:
-                self.activeSequences[1] = lights.Idle()
+                self.activeSequences[1] = lights.Idle(self.lights,self.signal)
             
             cont = self.activeSequences[2].run()
             if not cont:
-                self.activeSequences[2] = lights.IdleSky()
+                self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
             
+            print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
             await asyncio.sleep(0.1)
             # self.lights.show()
         return

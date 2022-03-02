@@ -1,5 +1,6 @@
 # This file controls the low level light stuff
 import asyncio
+from email.mime import image
 from functools import lru_cache
 import random
 
@@ -25,21 +26,42 @@ class LightSequence:
         self.progress = 0
         return
     
+    def openImg(self,imgname):
+        try:
+            self.im = Image.open(IMAGESPATH + imgname, 'r')
+        except:
+            raise IOError('Problem loading image \"' + imgname + '\"')
+        mode = self.im.mode
+        if mode not in ['RGB', 'RGBA']:
+            raise IOError('File \"' + imgname + '\" is not opening in RGB or RGBA mode. Please make sure file is saved in an appropriate format (like png)')
+        return True
+    
     def getRow(self, image, row, numPixels):
         width,height = image.size
         isvalid = row*width < width*height
         if not isvalid:
             return False
-        rpix = list(image.getdata())[width*row:width*(row+1)]
-
-        rout = [rpix[self.vmap(n,0,width,0,numPixels)] for n in range(0,numPixels)]
-
+        rpix = list(image.getdata())[(width*row):(width*(row+1))]
+        #print([x[0] for x in rpix])
+        rout = [rpix[self.vmap(n,0,numPixels,0,width)][0:3] for n in range(0,numPixels)]
         return rout
 
     def vmap(self, x, inMin, inMax, outMin, outMax):
         """This is the map() function from Arduino. 
         Im using it to sample from the image rows."""
-        return int((x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin)
+        y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+        return int(y)
+
+    def playImg(self):
+        """Play an image row by row on the lights."""
+        rout = self.getRow(self.im, self.progress, self.lRange[1]-self.lRange[0])
+        if not rout:
+            return False
+        else:
+            #print([x[0] for x in rout])
+            self.lights[self.lRange[0]:self.lRange[1]] = rout
+            self.progress += 1
+        return True
 
     def run(self):
         """Run should return true until the animation is done playing"""
@@ -140,19 +162,11 @@ class Ground(LightSequence):
 class Mars(LightSequence):
     def __init__(self, lights, lRange, distance=None, strength=None):
         super().__init__(lights, lRange, distance, strength)
-        
-        self.im = Image.open(IMAGESPATH + 'Mars.png', 'r')
-        
+        filename = 'Mars.png'
+        self.stop = not self.openImg(filename)
     
     def run(self):
-        rout = self.getRow(self.im, self.progress, self.lRange[1]-self.lRange[0])
-        print(rout)
-        if not rout:
-            return False
-        else:
-            self.lights[self.lRange[0]:self.lRange[1]] = rout
-            self.progress += 1
-        return True
+        return self.playImg()
 
     
     

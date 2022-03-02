@@ -11,17 +11,6 @@ WS2812 light strips and [their python library from adafruit](https://learn.adafr
 
 ## Where are you in development??
 
-You are implementing the Lights.LightSequence.getRow() function. Currently it is not behaving properly.
-
-it is:
-- maybe not sampling right using the vmap function
-- injecting random longer tuples
-- being generally weird
-
-after that you need to generalize all the planet functions.
-
-## Further Steps
-
 Finish adding all the planets incl. deep and near space
 
 Make a cool transmission animation (maybe draw, but maybe do programatically)
