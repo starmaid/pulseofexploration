@@ -2,6 +2,8 @@
 
 I love [Dan Goods' art installation at JPL "Pulse of Exploration"](https://vimeo.com/93420747)
 
+I love [cool light displays](https://starmaid.github.io/projects/hallie-lights)
+
 This pulls data from [JPL Eyes DSN.](https://eyes.nasa.gov/dsn/dsn.html)
 
 This project uses [Adafruit CircuitPython](https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/overview)
