@@ -3,9 +3,10 @@
         "ground": 10,
         "signal": 10,
         "sky": 10,
-        "rgb": true,
-        "groundFirst": true
     },
+	"rgb": true,
+    "groundFirst": true
+	"theme": "Default",
     "ships": {
         "vgr1": "DeepSpace",
         "vgr2": "DeepSpace",
