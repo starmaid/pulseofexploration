@@ -15,8 +15,6 @@ WS2812 light strips and [their python library from adafruit](https://learn.adafr
 
 Finish adding all the planets incl. deep and near space
 
-Make a cool transmission animation (maybe draw, but maybe do programatically)
-
 make a setup script for the user
 
 make a cool ground, reactive to time of day

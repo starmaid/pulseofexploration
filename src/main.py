@@ -9,20 +9,21 @@ import lights
 
 
 class Pulse:
-    def __init__(self,numLeds):
+    def __init__(self):
         # Load the config file with ship/planet associations
         with open("./data/config.json","r") as f:
             self.config = json.load(f)
-
+        
+        numLeds = [self.config['lights'][a] for a in ['ground', 'signal', 'sky']]
         """Sets up the lights array and the async queue"""
         #ORDER = neopixel.GRB
         #self.lights = neopixel.NeoPixel(board.D18, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
         self.lights = [(0,0,0)] * sum(numLeds)
 
         # tuple ranges for each section so we can pass them to sequences
-        self.ground = (0, numLeds[0]-1)
-        self.signal = (numLeds[0], numLeds[0]+numLeds[1]-1)
-        self.sky = (numLeds[0]+numLeds[1], sum(numLeds)-1)
+        self.ground = (0, numLeds[0])
+        self.signal = (numLeds[0], numLeds[0]+numLeds[1])
+        self.sky = (numLeds[0]+numLeds[1], sum(numLeds))
 
         # list of currently active sequences
         self.activeSequences = [None, None, None]
@@ -66,7 +67,7 @@ class Pulse:
                             newSequence = classname(self.lights,self.sky)
 
                         else:
-                            newSequence = lights.DeepSpace(self.lights,self.sky)
+                            newSequence = lights.Mars(self.lights,self.sky)
 
                         await self.queue.put(newSequence)
 
@@ -138,7 +139,7 @@ class Pulse:
             if not cont:
                 self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
             
-            print(str([self.lights[a][1] for a in range(0,len(self.lights))]) + '\r',end='')
+            print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
             await asyncio.sleep(0.1)
             # self.lights.show()
         return
@@ -147,10 +148,8 @@ class Pulse:
     
 # This is the section of the program that runs when executed
 if __name__ == "__main__":
-    numlights = [10,10,10]
-
     # create the parser
-    p = Pulse(numlights)
+    p = Pulse()
 
     # start the job.
     # this is a blocking call and will not move forward until finished
