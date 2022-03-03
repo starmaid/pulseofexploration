@@ -37,7 +37,7 @@ class Pulse:
         """start both threads, and wait for them to finish before ending."""
         # self.runDsn(self.queue),
         await asyncio.gather(
-            
+            self.runDsn(self.queue),
             self.runSequenceQueue(self.queue),
             self.runLights(self.queue)
             )
@@ -60,17 +60,17 @@ class Pulse:
                     # put the new objects in
                     for s in newsignals:
                         newSequence = None
-                        if s['name'] in self.config['ships'].keys():
-                            locname = self.config['ships'][s['name']]
+                        if s in self.config['ships'].keys():
+                            locname = self.config['ships'][s]
                             classname = getattr(lights,locname)
                             newSequence = classname(self.lights,self.sky)
 
                         else:
                             newSequence = lights.DeepSpace(self.lights,self.sky)
 
-                        self.queue.put(newSequence)
+                        await self.queue.put(newSequence)
 
-                asyncio.sleep(5)
+                await asyncio.sleep(5)
                 
             except KeyboardInterrupt:
                 # Add the stop object
@@ -105,13 +105,14 @@ class Pulse:
                     self.activeSequences = [obj,obj,obj]
                 else:
                     self.activeSequences[2] = obj
-                    self.activeSequences[1] = lights.Transmission()
+                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal)
+                    print('\nNew sequence')
                     # set the sky as the new sky
                     # set the signal parameters and add
             
             # Because this is just placing different objects in the queue
             # It can run at a lower clock speed than the framerate
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
         return
 
     async def runLights(self, queue):
@@ -130,12 +131,14 @@ class Pulse:
             cont = self.activeSequences[1].run()
             if not cont:
                 self.activeSequences[1] = lights.Idle(self.lights,self.signal)
-            
+                self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
+                print('\nStop Sequence')
+
             cont = self.activeSequences[2].run()
             if not cont:
                 self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
             
-            print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
+            print(str([self.lights[a][1] for a in range(0,len(self.lights))]) + '\r',end='')
             await asyncio.sleep(0.1)
             # self.lights.show()
         return

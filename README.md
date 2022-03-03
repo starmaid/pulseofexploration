@@ -17,8 +17,6 @@ Finish adding all the planets incl. deep and near space
 
 Make a cool transmission animation (maybe draw, but maybe do programatically)
 
--- check to make sure it works with dsn and with real lights -- 
-
 make a setup script for the user
 
 make a cool ground, reactive to time of day

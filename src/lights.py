@@ -98,17 +98,11 @@ class Transmission(LightSequence):
 
     def __init__(self, lights, lRange, distance=None, strength=None):
         super().__init__(lights, lRange, distance, strength)
-    
+        filename = 'Transmission.png'
+        self.stop = not self.openImg(filename)
+
     def run(self):
-        if self.progress < self.lRange[1]-self.lRange[0]:
-            # set all to off
-            self.lights[self.lRange[0]:self.lRange[1]] = [(0,0,0) for i in range(self.lRange[0],self.lRange[1])]
-            # set just one on
-            self.lights[self.lRange[1]-self.progress] = (255,255,255)
-            self.progress += 1
-            return True
-        else:
-            return False
+        return self.playImg()
 
 
 class IdleSky(LightSequence):
@@ -144,6 +138,27 @@ class DeepSpace(LightSequence):
     """deep space twinkle"""
     def __init__(self, lights, lRange, distance=None, strength=None):
         super().__init__(lights, lRange, distance, strength)
+    
+    def run(self):
+        """FASTER turns one random light on, fades every light that is currently on"""
+        s = 15
+        for i in range(self.lRange[0],self.lRange[1]):
+            b = self.lights[i][0]
+            if b > 0:
+                c = b - s
+                if c < 0:
+                    self.lights[i] = (0,0,0)
+                else:
+                    self.lights[i] = (c,c,c)
+        
+        self.progress += 1
+
+        if self.progress == 5:
+            j = random.randrange(self.lRange[0],self.lRange[1])
+            self.lights[j] = (255,255,255)
+            self.progress = 0
+        
+        return True
     
 
 class Ground(LightSequence):

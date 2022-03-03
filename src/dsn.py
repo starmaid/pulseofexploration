@@ -1,3 +1,4 @@
+from os import remove
 import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime
@@ -88,18 +89,26 @@ class DSNQuery:
 
     def getNew(self):
         signals = self.poll()
+        
         newsignals = []
         
-        # Add new signal we just saw to the active ones
-        for s in signals:
-            if s not in self.activeSignals:
+        # Add any new signal we just saw to the active ones
+        for s in signals.keys():
+            if s not in self.activeSignals.keys():
                 newsignals.append(s)
-                self.activeSignals["name"] = s
+                self.activeSignals[s] = signals[s]
         
         # Remove signal if it is no longer active
-        for s in self.activeSignals:
-            if s not in signals:
-                self.activeSignals.popitem["name"]
+        removenames = []
+        for s in self.activeSignals.keys():
+            if s not in signals.keys():
+                removenames.append(s)
+        
+        for name in removenames:
+            self.activeSignals.pop(name)
+
+        if len(newsignals) > 0:
+            print('\n' + str(newsignals))
         
         return newsignals
 
