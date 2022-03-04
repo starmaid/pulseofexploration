@@ -2,7 +2,6 @@
     "ships": {
         "vgr1": "DeepSpace",
         "vgr2": "DeepSpace",
-        "msl": "Mars",
-        "hst": "FunnyMeme"
+        "msl": "Mars"
     }
 }

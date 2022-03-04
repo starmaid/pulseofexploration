@@ -1,24 +1,63 @@
+# main.py
+# Written by Starmaid in early 2022
+
+# Builtin Libraries
 import asyncio
 import json
+from msilib.schema import Error
+import platform
+import logging
+from datetime import datetime
 
-#import board
-#import neopixel
+# Determine if we should enter debug mode
+if 'arm' in platform.machine():
+    # then we are running on a board that can do lights. probably
+    live = True
+    import board
+    import neopixel
+    logfilename = str(datetime.now())[0:10] + '.log'
+    logging.basicConfig(filename=logfilename, format='%(asctime)s %(levelname)s %(message)s', level=logging.WARNING)
+else:
+    live = False
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG)
 
+
+
+# Custom modules
 import dsn
 import lights
 
 
 class Pulse:
     def __init__(self):
+        """Sets up the config, lights array, and the async queue"""
+
         # Load the config file with ship/planet associations
-        with open("./data/config.json","r") as f:
-            self.config = json.load(f)
-        
+        try:
+            with open("./data/config.json","r") as f:
+                self.config = json.load(f)
+        except Exception as e:
+            logging.error('Error loading config file: ' + str(e))
+            logging.error('Stopping Program')
+            raise
+
+        try:
+            self.themeName = self.config['theme']
+            with open("./data/" + str(self.themeName) + "/theme.json","r") as f2:
+                self.theme = json.load(f2)
+        except Exception as e:
+            logging.error('Error loading theme: ' + str(e))
+            logging.error('Stopping Program')
+            raise
+
         numLeds = [self.config['lights'][a] for a in ['ground', 'signal', 'sky']]
-        """Sets up the lights array and the async queue"""
-        #ORDER = neopixel.GRB
-        #self.lights = neopixel.NeoPixel(board.D18, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
-        self.lights = [(0,0,0)] * sum(numLeds)
+        
+        global live
+        if live:
+            ORDER = neopixel.GRB
+            self.lights = neopixel.NeoPixel(board.D18, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
+        else:
+            self.lights = [(0,0,0)] * sum(numLeds)
 
         # tuple ranges for each section so we can pass them to sequences
         self.ground = (0, numLeds[0])
@@ -29,7 +68,7 @@ class Pulse:
         self.activeSequences = [None, None, None]
 
         # Create an empty queue for our instructions to be stored in
-        self.queue = asyncio.Queue(maxsize=200)
+        self.queue = asyncio.Queue(maxsize=50)
 
         #self.queue.put_nowait()
 
@@ -61,13 +100,25 @@ class Pulse:
                     # put the new objects in
                     for s in newsignals:
                         newSequence = None
-                        if s in self.config['ships'].keys():
-                            locname = self.config['ships'][s]
-                            classname = getattr(lights,locname)
-                            newSequence = classname(self.lights,self.sky)
+                        if s in self.theme['ships'].keys():
+                            locname = self.theme['ships'][s]
+
+                            logging.debug('%s loading %s from theme', s, locname)
+
+                            try:
+                                # Attempt to load the class from lights.py
+                                classname = getattr(lights,locname)
+                                newSequence = classname(self.lights,self.sky)
+                                logging.debug('Found LightSequence class ', classname)
+                            except AttributeError:
+                                # If that that class doesnt exist, load that image
+                                logging.debug('LightSequence Class not found. Loading image file')
+                                newSequence = lights.Img(self.lights,self.sky,self.themeName,locname)
+                            
 
                         else:
-                            newSequence = lights.Mars(self.lights,self.sky)
+                            logging.debug('%s not found in config, loading DeepSpace')
+                            newSequence = lights.DeepSpace(self.lights,self.sky)
 
                         await self.queue.put(newSequence)
 
@@ -90,7 +141,7 @@ class Pulse:
         # set the startup running sequences
         self.activeSequences = [lights.Ground(self.lights,self.ground), 
                             lights.Idle(self.lights,self.signal), 
-                            lights.Mars(self.lights,self.sky)]
+                            lights.IdleSky(self.lights,self.sky)]
 
 
         #prev = await queue.get()
@@ -132,16 +183,19 @@ class Pulse:
             cont = self.activeSequences[1].run()
             if not cont:
                 self.activeSequences[1] = lights.Idle(self.lights,self.signal)
-                self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
-                print('\nStop Sequence')
+                logging.debug('End of signal sequence')
 
             cont = self.activeSequences[2].run()
             if not cont:
                 self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
+                logging.debug('End of sky sequence')
+
+            if live:
+                self.lights.show()
+            else:
+                print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
             
-            print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
             await asyncio.sleep(0.1)
-            # self.lights.show()
         return
     
 

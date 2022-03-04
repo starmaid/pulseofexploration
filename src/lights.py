@@ -1,8 +1,7 @@
 # This file controls the low level light stuff
 import asyncio
-from email.mime import image
-from functools import lru_cache
 import random
+import logging
 
 from PIL import Image
 
@@ -151,14 +150,16 @@ class DeepSpace(LightSequence):
                 else:
                     self.lights[i] = (c,c,c)
         
-        self.progress += 1
-
-        if self.progress == 5:
+        if self.progress % 5 == 0:
             j = random.randrange(self.lRange[0],self.lRange[1])
             self.lights[j] = (255,255,255)
-            self.progress = 0
-        
-        return True
+
+        self.progress += 1
+
+        if self.progress < 20:
+            return True
+        else:
+            return False
     
 
 class Ground(LightSequence):
@@ -171,14 +172,11 @@ class Ground(LightSequence):
         if self.progress == 0:
             self.lights[self.lRange[0]:self.lRange[1]] = [(0,255,0) for i in range(self.lRange[0],self.lRange[1])]
         return True
-    
 
-
-class Mars(LightSequence):
-    def __init__(self, lights, lRange, distance=None, strength=None):
+class Img(LightSequence):
+    def __init__(self, lights, lRange, theme, filename, distance=None, strength=None):
         super().__init__(lights, lRange, distance, strength)
-        filename = 'Mars.png'
-        self.stop = not self.openImg(filename)
+        self.stop = not self.openImg(theme + '/' + filename + '.png')
     
     def run(self):
         return self.playImg()

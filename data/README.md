@@ -69,10 +69,10 @@ After creating this theme, you must modify your main `config.json` file to refle
         "signal": 10,
         "sky": 10
     },
-	"rgb": true,
+    "rgb": true,
     "groundFirst": true,
     "framerate": 10,
-	"theme": "Default"
+    "theme": "Default"
 }
 ```
 

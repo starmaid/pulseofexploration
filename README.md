@@ -17,14 +17,14 @@ Me, [Kore](https://rustycaard.carrd.co/), ... [more soon]
 
 ## Where are you in development??
 
-should config files be split, so that each theme has an alignment to ships, while the master config only has to do with the lights themselves? anyway.
+adding logging statements instead of prints
+
+adding exception handling for things that could go wrong
 
 Editing the config file to support themes, groundfirst, etc
-
-Adding support for arbitrary image names
 
 make a setup script for the user
 
 make a cool ground, reactive to time of day
 
-Finish adding all the planets incl. deep and near space
+Finish adding all the planets incl. deep and near space + the default theme config file
