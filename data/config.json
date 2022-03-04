@@ -2,14 +2,10 @@
     "lights": {
         "ground": 10,
         "signal": 10,
-        "sky": 10,
+        "sky": 10
     },
 	"rgb": true,
-    "groundFirst": true
-	"theme": "Default",
-    "ships": {
-        "vgr1": "DeepSpace",
-        "vgr2": "DeepSpace",
-        "msl": "Mars"
-    }
+    "groundFirst": true,
+    "framerate": 10,
+	"theme": "Default"
 }

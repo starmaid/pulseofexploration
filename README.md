@@ -17,6 +17,8 @@ Me, [Kore](https://rustycaard.carrd.co/), ... [more soon]
 
 ## Where are you in development??
 
+should config files be split, so that each theme has an alignment to ships, while the master config only has to do with the lights themselves? anyway.
+
 Editing the config file to support themes, groundfirst, etc
 
 Adding support for arbitrary image names
