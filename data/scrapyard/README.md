@@ -4,10 +4,16 @@ This pack was made by several people.
 
 | Body        | User                                      |
 | ----------- | ---------------------------------------   |
-| Mercury     |    |
-| Venus       | |
-| Mars        |  |
+| Sun         | []() |
+| Mercury     | []() |
+| Venus       | []() |
 | Earth       | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)   |
+| Mars        | []() |
+| Jupiter     | []() |
+| Saturn      | []() |
+| Uranus      | []() |
+| Neptune     | []() |
+| Pluto       | []() |
 
 # Previews
 

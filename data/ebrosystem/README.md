@@ -4,9 +4,17 @@ This pack was made by several people.
 
 | Body        | User                                      |
 | ----------- | ---------------------------------------   |
+| Sun         | []() |
 | Mercury     | [Rusty](https://rustycaard.carrd.co/)     |
 | Venus       | [Eris](https://starryfansquid.tumblr.com) |
+| Earth       | []() |
+| Moon        | []() |
 | Mars        | [Ender](https://enderesting.tumblr.com)   |
+| Jupiter     | []() |
+| Saturn      | []() |
+| Uranus      | []() |
+| Neptune     | []() |
+| Pluto       | []() |
 
 # Previews
 
