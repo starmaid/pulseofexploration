@@ -39,6 +39,7 @@ make a cool ground, reactive to time of day
 
 - MicroSD adapter for your computer
 - Wire cutters
+- Soldering Iron
 - Knife
 
 ### Steps
@@ -53,17 +54,65 @@ make a cool ground, reactive to time of day
 
 5. Connect the MicroSD card to your computer. Use Etcher to flash the OS image you just downloaded.
 
-6. Download from this GitHub page [wpa_cupplicant.conf]() and [ssh]()
+6. Download from this GitHub page [wpa_cupplicant.conf](https://raw.githubusercontent.com/starmaid/pulseofexploration/master/setup/wpa_supplicant.conf) and [ssh](https://raw.githubusercontent.com/starmaid/pulseofexploration/master/setup/ssh). Right click and use 'save page as' to download them. `ssh` is an empty file.
 
-6. Using a text editor (like notepad), edit the `wpa_supplicant.conf` file to include the credentials for your wifi network.
+7. Using a text editor (like notepad), edit the `wpa_supplicant.conf` file to include the credentials for your wifi network.
 
-7. Copy both the `wpa_supplicant.conf` and `ssh` files into the `X:/boot` drive that appears after flashing the SD card.
+8. Copy both the `wpa_supplicant.conf` and `ssh` files into the `X:/boot` drive that appears after flashing the SD card.
 
-8. Remove the MicroSD card from your computer and put it in the Raspberry Pi.
+9. Remove the MicroSD card from your computer and put it in the Raspberry Pi.
 
-9. 
+10. Power on the Raspberry Pi by connecting the power cable.
 
+11. Open a terminal on your computer (PowerShell, Terminal).
 
+12. Connect to the Raspberry Pi via SSH. In the terminal, enter 
+
+    ```
+    ssh pi@raspberrypi.local
+    ```
+
+13. Enter `yes` to the message that may appear:
+
+    ```
+    The authenticity of host 'raspberrypi.local (fe80::5865:c6fa:3262:1820%3)' can't be established.
+    ECDSA key fingerprint is SHA256:G1RRXKWJnsGA7j/0oRljfqipTu5YVfbcdddXS7j8n74. 
+    Are you sure you want to continue connecting (yes/no/[fingerprint])? 
+    ```
+
+14. Login to the `pi` account. The default password is `raspberry`. While you type the password, the characters will not appear.
+
+15. Enter `pwd` and follow the instructions to change the default password.
+
+16. Install git to download the files from this repository.
+
+    ```
+    sudo apt install git
+    ```
+
+17. Download the files from this repository.
+
+    ```
+    git clone https://github.com/starmaid/pulseofexploration.git
+    ```
+
+18. Navigate to and run the install script.
+
+    ```
+    cd ./pulseofexploration
+    chmod +x ./install.sh
+    ./install.sh
+    ```
+
+19. Turn off the Raspberry Pi.
+
+    ```
+    sudo poweroff
+    ```
+
+20. Take your knife and pop the pins from the LED strip connector
+
+21.
 
 ## Power Consumption Details
 
