@@ -1,6 +1,11 @@
 import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime
+import logging
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger('charset_normalizer').setLevel(logging.WARNING)
 
 class DSNQuery:
     """Handles data queries from NASA DSN"""
@@ -13,7 +18,8 @@ class DSNQuery:
     def getFriendlyNames(self):
         # get friendly names
         friendlyxml = requests.get('https://eyes.nasa.gov/dsn/config.xml')
-        friendlynames = ET.fromstring(friendlyxml.text)
+        parser = ET.XMLParser(encoding='UTF-8')
+        friendlynames = ET.fromstring(friendlyxml.text, parser=parser)
         # make dict of friendlynames
         allships = friendlynames.findall("./spacecraftMap/spacecraft")
         self.friendlyTranslator = {}
@@ -63,7 +69,7 @@ class DSNQuery:
             try:
                 sDict['friendlyName'] = self.friendlyTranslator[name]
             except:
-                print("key " + name + " not found")
+                #print("key " + name + " not found")
                 continue
             
             sDict['range'] = float(target.attrib['uplegRange']) # in km

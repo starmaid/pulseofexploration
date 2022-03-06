@@ -5,6 +5,8 @@ import logging
 
 from PIL import Image
 
+logging.getLogger("PIL").setLevel(logging.WARNING)
+
 #import board
 #import neopixel
 

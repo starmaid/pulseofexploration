@@ -9,6 +9,9 @@ import platform
 import logging
 from datetime import datetime
 
+logging.getLogger("asyncio").setLevel(logging.WARNING)
+
+
 # Determine if we should enter debug mode
 if 'arm' in platform.machine():
     # then we are running on a board that can do lights. probably
@@ -20,7 +23,6 @@ if 'arm' in platform.machine():
 else:
     live = False
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-
 
 
 # Custom modules
@@ -60,9 +62,14 @@ class Pulse:
             self.lights = [(0,0,0)] * sum(numLeds)
 
         # tuple ranges for each section so we can pass them to sequences
-        self.ground = (0, numLeds[0])
-        self.signal = (numLeds[0], numLeds[0]+numLeds[1])
-        self.sky = (numLeds[0]+numLeds[1], sum(numLeds))
+        if self.config['groundFirst']:
+            self.ground = (0, numLeds[0])
+            self.signal = (numLeds[0], numLeds[0]+numLeds[1])
+            self.sky = (numLeds[0]+numLeds[1], sum(numLeds))
+        else:
+            self.sky = (0, numLeds[2])
+            self.signal = (numLeds[2], numLeds[2]+numLeds[1])
+            self.ground = (numLeds[2]+numLeds[1], sum(numLeds))
 
         # list of currently active sequences
         self.activeSequences = [None, None, None]
@@ -117,7 +124,7 @@ class Pulse:
                             
 
                         else:
-                            logging.debug('%s not found in config, loading DeepSpace')
+                            logging.debug('%s not found in config, loading DeepSpace',s)
                             newSequence = lights.DeepSpace(self.lights,self.sky)
 
                         await self.queue.put(newSequence)
@@ -193,7 +200,13 @@ class Pulse:
             if live:
                 self.lights.show()
             else:
-                print(str([self.lights[a][0] for a in range(0,len(self.lights))]) + '\r',end='')
+                # turn the lights into a 0-9 scale of brightness
+                allL = [int(sum(self.lights[a])/3/25.6) for a in range(0,len(self.lights))]
+                allLString = ''
+                for l in allL:
+                    allLString += str(l)
+
+                print(allLString + '\r',end='')
             
             await asyncio.sleep(0.1)
         return

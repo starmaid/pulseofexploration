@@ -13,15 +13,9 @@ WS2812 light strips and [their python library from adafruit](https://learn.adafr
 
 ## Who made these animation themes?
 
-Me, [Kore](https://rustycaard.carrd.co/), ... [more soon]
+Check out the README files in each theme folder!
 
 ## Where are you in development??
-
-adding logging statements instead of prints
-
-adding exception handling for things that could go wrong
-
-Editing the config file to support themes, groundfirst, etc
 
 make a setup script for the user
 
