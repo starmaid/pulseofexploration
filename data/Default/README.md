@@ -14,16 +14,18 @@ The `theme.json` file contains the majority of active ships and some sensible de
 
 ![Earth](./Earth.png)
 
+![Telescope](./Telescope.png)
+
 ![Moon](./Moon.png)
+
+![Asteroids](./Asteroids.png)
 
 ![Mars](./Mars.png)
 
+![MarsSurface](./MarsSurface.png)
+
 ![Jupiter](./Jupiter.png)
 
-![Saturn](./Saturn.png)
+![DeepProbe](./DeepProbe.png)
 
-![Uranus](./Uranus.png)
-
-![Neptune](./Neptune.png)
-
-![Pluto](./Pluto.png)
+![Special](./Special.png)

@@ -8,13 +8,14 @@ This pack was made by several people.
 | Mercury     | [Rusty](https://rustycaard.carrd.co/)     |
 | Venus       | [Eris](https://starryfansquid.tumblr.com) |
 | Earth       | []() |
+| Telescope   | []() |
 | Moon        | []() |
+| Asteroids   | []() |
 | Mars        | [Ender](https://enderesting.tumblr.com)   |
+| MarsSurface | []() |
 | Jupiter     | []() |
-| Saturn      | []() |
-| Uranus      | []() |
-| Neptune     | []() |
-| Pluto       | []() |
+| DeepProbe   | []() |
+| Special     | []() |
 
 # Previews
 
@@ -26,16 +27,18 @@ This pack was made by several people.
 
 ![Earth](./Earth.png)
 
+![Telescope](./Telescope.png)
+
 ![Moon](./Moon.png)
+
+![Asteroids](./Asteroids.png)
 
 ![Mars](./Mars.png)
 
+![MarsSurface](./MarsSurface.png)
+
 ![Jupiter](./Jupiter.png)
 
-![Saturn](./Saturn.png)
+![DeepProbe](./DeepProbe.png)
 
-![Uranus](./Uranus.png)
-
-![Neptune](./Neptune.png)
-
-![Pluto](./Pluto.png)
+![Special](./Special.png)

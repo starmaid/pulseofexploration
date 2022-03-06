@@ -8,12 +8,14 @@ This pack was made by several people.
 | Mercury     | []() |
 | Venus       | []() |
 | Earth, pixel_cat | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)   |
+| Telescope   | []() |
+| Moon        | []() |
+| Asteroids   | []() |
 | Mars        | []() |
+| MarsSurface | []() |
 | Jupiter     | []() |
-| Saturn      | []() |
-| Uranus      | []() |
-| Neptune     | []() |
-| Pluto       | []() |
+| DeepProbe   | []() |
+| Special     | []() |
 
 # Previews
 
@@ -27,16 +29,18 @@ This pack was made by several people.
 
 ![Earth](./Earth.png)
 
+![Telescope](./Telescope.png)
+
 ![Moon](./Moon.png)
+
+![Asteroids](./Asteroids.png)
 
 ![Mars](./Mars.png)
 
+![MarsSurface](./MarsSurface.png)
+
 ![Jupiter](./Jupiter.png)
 
-![Saturn](./Saturn.png)
+![DeepProbe](./DeepProbe.png)
 
-![Uranus](./Uranus.png)
-
-![Neptune](./Neptune.png)
-
-![Pluto](./Pluto.png)
+![Special](./Special.png)
