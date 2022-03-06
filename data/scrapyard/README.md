@@ -1,4 +1,4 @@
-# ebrosystem Theme Pack
+# scrapyard Theme Pack
 
 This pack was made by several people.
 
@@ -7,7 +7,7 @@ This pack was made by several people.
 | Sun         | []() |
 | Mercury     | []() |
 | Venus       | []() |
-| Earth       | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)   |
+| Earth, pixel_cat | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)   |
 | Mars        | []() |
 | Jupiter     | []() |
 | Saturn      | []() |
@@ -16,6 +16,8 @@ This pack was made by several people.
 | Pluto       | []() |
 
 # Previews
+
+![Pixel Cat](./pixel_cat.png)
 
 ![Sun](./Sun.png)
 
