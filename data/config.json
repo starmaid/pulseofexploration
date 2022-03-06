@@ -5,7 +5,7 @@
         "sky": 10
     },
 	"rgb": true,
-    "groundFirst": false,
+    "groundFirst": true,
     "framerate": 10,
 	"theme": "Default"
 }

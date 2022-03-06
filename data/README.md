@@ -4,25 +4,25 @@
 
 I wanted to create a 1-D light strip as a vizualizer for the DSN Now data. This light strip is split into three segments: Ground, Signal, and Sky.
 
-![](../man/system.png)
+![](../docs/system.png)
 
 When a signal comes in on the DSN, I want to play an animation in the night sky that tells where the signal is coming from; LEO, Moon, Mars, Jupiter, wherever. 
 
 However, I didn't want to hand-write RGB values in arrays. That gets tedious and is not necessary when we have a way to easily make and store sets of color data - 2-D images! So, each row of an image can be played sequentially on our row of lights.
 
-![](../man/frame1.png)
+![](../docs/frame1.png)
 
-![](../man/frame2.png)
+![](../docs/frame2.png)
 
 ...and so on. Of course, it would be obnoxious to force the images to be the same dimensions of the actual light strip, so I have a scaling function so that light strips that are smaller/larger work well. 
 
 One effect that I wanted was a glowing effect that radiates from the center for a planet 'looming overhead'. 
 
-![](../man/planetvibe.png)
+![](../docs/planetvibe.png)
 
 However, I realized that this animation, when represented as an image, is a circle. How fitting would it be then, if the animations themselves were art of the planets!
 
-![](../man/pixelart.png)
+![](../docs/pixelart.png)
 
 Of course, it doesnt have to be a planet. The animation can be anything fun. For example, you could blink morse code on the lights, or just do cool patterns. You just have to define the craft that uses that image filename in the theme config file.
 
@@ -56,7 +56,7 @@ The `theme.json` file defines which crafts use which images. JSON files are plai
 
 Inside the `theme.json` file, there is a list of crafts. These are the abbreviations given in The [DSN Now Config File](https://eyes.nasa.gov/dsn/config.xml). Any ship that is in that file could appear, but there are several decommissioned probes and rovers that are no longer in service still listed.
 
-![](../man/config.png)
+![](../docs/config.png)
 
 Here, the Hubble Space Telescope 'hst' will use the image filename 'FunnyMeme' (.png).
 

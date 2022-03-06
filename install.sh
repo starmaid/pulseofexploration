@@ -24,9 +24,5 @@ sudo python3 -m pip install --force-reinstall adafruit-blinka
 # Install other dependencies
 sudo pip3 install requests pillow
 
-# set config in ./data/config.json easily
-# sed something
-
-# Set up a daemon or autorun
-# crontab -e
-# echo "@reboot python /home/pi/pulseofexploration/run.sh" >> ?thecrontabfile?
+# Set up an autorun at boot. No need to eat output, logs go directly to their files
+(crontab -l ; echo "@reboot python /home/pi/pulseofexploration/run.sh") | sort - | uniq - | crontab -
