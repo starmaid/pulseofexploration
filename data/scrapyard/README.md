@@ -4,10 +4,10 @@ This pack was made by several people.
 
 | Body        | User                                      |
 | ----------- | ---------------------------------------   |
-| Sun         | []() |
+| Sun         | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png) |
 | Mercury     | []() |
 | Venus       | []() |
-| Earth, pixel_cat | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)   |
+| Earth | [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png)  |
 | Telescope   | []() |
 | Moon        | []() |
 | Asteroids   | []() |
@@ -16,6 +16,7 @@ This pack was made by several people.
 | Jupiter     | []() |
 | DeepProbe   | []() |
 | Special     | []() |
+| pixel_cat |  [Swanky](https://media.discordapp.net/attachments/850178936020664370/949924540719448064/withered_cat2.png) |
 
 # Previews
 

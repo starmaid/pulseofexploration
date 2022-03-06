@@ -20,5 +20,3 @@ Check out the README files in each theme folder!
 make a setup script for the user
 
 make a cool ground, reactive to time of day
-
-Finish adding all the planets incl. deep and near space + the default theme config file

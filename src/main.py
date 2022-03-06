@@ -74,6 +74,8 @@ class Pulse:
         # list of currently active sequences
         self.activeSequences = [None, None, None]
 
+        self.framedelay = 1 / int(self.config['framerate'])
+
         # Create an empty queue for our instructions to be stored in
         self.queue = asyncio.Queue(maxsize=50)
 
@@ -208,7 +210,7 @@ class Pulse:
 
                 print(allLString + '\r',end='')
             
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(self.framedelay)
         return
     
 
