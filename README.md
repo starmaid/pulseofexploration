@@ -138,6 +138,8 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 ## Power Consumption Details
 
+This program barely consumes any resources - 3% normally, 9% during web pulls (once every 5 sec), and maximum 30% load during startup, and maybe 30 Mb RAM. WiFi module usage exists, but is low, again only polling by default every 5 seconds. 
+
 WS2812b strip, draws about 55 mA/px
 
 | Board  | Power Draw with mild load (mA) | Lights you could power through the board with a 2 A Supply |

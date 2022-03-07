@@ -35,4 +35,4 @@ sudo chown pi.gpio /dev/mem
 sudo chmod a+rw /dev/mem
 
 # Set up an autorun at boot. No need to eat output, logs go directly to their files
-(crontab -l ; echo "@reboot /home/pi/pulseofexploration/run.sh") | uniq - | crontab -
+(crontab -l ; echo "@reboot /home/pi/pulseofexploration/run.sh &") | uniq - | crontab -
