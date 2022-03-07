@@ -20,7 +20,7 @@ if 'arm' in platform.machine():
     logfilename = str(datetime.now())[0:10] + '.log'
     logging.basicConfig(filename=logfilename, format='%(asctime)s %(levelname)s %(message)s', level=logging.WARNING)
     print('Starting lights in live mode')
-    logging.WARNING('Starting lights in live mode')
+    logging.warning('Starting lights in live mode')
 else:
     live = False
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
@@ -103,11 +103,15 @@ class Pulse:
     async def start(self):
         """start both threads, and wait for them to finish before ending."""
         # self.runDsn(self.queue),
-        await asyncio.gather(
-            self.runDsn(self.queue),
-            self.runSequenceQueue(self.queue),
-            self.runLights(self.queue)
-            )
+        try: 
+            await asyncio.gather(
+                self.runDsn(self.queue),
+                self.runSequenceQueue(self.queue),
+                self.runLights(self.queue)
+                )
+        except KeyboardInterrupt:
+            self.lights = [(0,0,0) for i in range(0,len(self.lights))]
+            self.lights.show()
         return
 
     async def runDsn(self, queue):
@@ -170,8 +174,6 @@ class Pulse:
                             lights.Idle(self.lights,self.signal), 
                             lights.IdleSky(self.lights,self.sky)]
 
-
-        #prev = await queue.get()
         running = True
 
         while running:
@@ -240,4 +242,10 @@ if __name__ == "__main__":
 
     # start the job.
     # this is a blocking call and will not move forward until finished
-    asyncio.run(p.start())
+    if live:
+        # For some reason this is required on the rpi??
+        # python 3.7
+        asyncio.get_event_loop().run_until_complete(p.start())
+    else:
+        # But on windows with python 3.10 gives depreciation warning
+        asyncio.run_until_complete(p.start())
