@@ -4,7 +4,6 @@
 # Builtin Libraries
 import asyncio
 import json
-from msilib.schema import Error
 import platform
 import logging
 from datetime import datetime
@@ -20,9 +19,12 @@ if 'arm' in platform.machine():
     import neopixel
     logfilename = str(datetime.now())[0:10] + '.log'
     logging.basicConfig(filename=logfilename, format='%(asctime)s %(levelname)s %(message)s', level=logging.WARNING)
+    print('Starting lights in live mode')
+    logging.WARNING('Starting lights in live mode')
 else:
     live = False
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+    print('Starting lights in test mode')
 
 
 # Custom modules

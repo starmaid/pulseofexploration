@@ -2,4 +2,4 @@
 pwd
 
 # run the program
-python3 ./src/main.py
+sudo python3 ./src/main.py
