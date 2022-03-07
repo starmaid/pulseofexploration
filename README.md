@@ -24,6 +24,28 @@ make a cool ground, reactive to time of day
 
 ## How to Build your Own
 
+### Deciding on a Build
+
+First, you have to decide what your setup will look like. This guide will focus on a small desktop setup, but it is possible to run this program on any length of LED strip - provided you have the power supply to support it.
+
+Each segment, the ground, signal, and sky, is optional. This will be presented to you during setup, but it should be decided before purchasing supplies. Here are some ideas for setups:
+
+*[PUT BUILD IMAGES HERE]*
+
+There are two options for wiring the lights. Running power through the Raspberry Pi, or using another power supply (or simply a larger supply with a different wiring).
+
+![](./docs/wiringA.png) 
+
+![](./docs/wiringB.png)
+
+| Board  | Power Draw with mild load (mA) | Lights you could power through the board with a 2 A Supply |
+| ------ | --------------- | ---------------------- |
+| Zero W | 300     | 30 |
+| 3 B+   | 700     | 22 |
+| 4 B    | 800     | 20 |
+
+If you are integrating this with another project, remember that the WS2812b lights need a pin with PCM (or PWM). By default the config uses `GPIO 18`, but see the [pinout](https://pinout.xyz/pinout/pcm#) for other options.
+
 ### Parts
 
 | Item   | Avg. Cost |
@@ -31,9 +53,9 @@ make a cool ground, reactive to time of day
 | Raspberry Pi Zero W |  $10 |
 | 4GB or larger microSD card | $8 |
 | 2A or more power adapter + cable | $5 |
-| WS2812b light strip | $10 |
+| WS2812b 5V light strip | $10 |
 
-**NOTE:** There is currently a global shortage of Raspberry Pi devices. It is more likely you will be able to pick one up from a local computer store for MSRP than online.
+**NOTE (Spring 2022):** There is currently a global shortage of Raspberry Pi devices. It is more likely you will be able to pick one up from a local computer store for MSRP than online.
 
 ### Tools
 
@@ -104,7 +126,7 @@ make a cool ground, reactive to time of day
     ./install.sh
     ```
 
-19. Turn off the Raspberry Pi.
+19. Turn off the Raspberry Pi, and then disconnect the power.
 
     ```
     sudo poweroff
@@ -118,7 +140,7 @@ make a cool ground, reactive to time of day
 
 WS2812b strip, draws about 55 mA/px
 
-| Board  | Power Draw with mild load (mA) | Lights you could power with a 2 A Supply |
+| Board  | Power Draw with mild load (mA) | Lights you could power through the board with a 2 A Supply |
 | ------ | --------------- | ---------------------- |
 | Zero W | 300     | 30 |
 | 3 B+   | 700     | 22 |

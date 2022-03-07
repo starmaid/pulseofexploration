@@ -42,9 +42,20 @@ class Pulse:
             logging.error('Error loading config file: ' + str(e))
             logging.error('Stopping Program')
             raise
+            
+        try:
+            # Loading all values from config
+            self.themeName = self.config['theme']
+            self.lightsegments = self.config['lights']
+            self.framerate = self.config['framerate']
+            self.pin = self.config['pin']
+            self.groundfirst = self.config['groundFirst']
+        except Exception as e:
+            logging.error('Value not found in config file: ' + str(e))
+            logging.error('Stopping Program')
+            raise
 
         try:
-            self.themeName = self.config['theme']
             with open("./data/" + str(self.themeName) + "/theme.json","r") as f2:
                 self.theme = json.load(f2)
         except Exception as e:
@@ -52,17 +63,22 @@ class Pulse:
             logging.error('Stopping Program')
             raise
 
-        numLeds = [self.config['lights'][a] for a in ['ground', 'signal', 'sky']]
+        numLeds = [self.lightsegments[a] for a in ['ground', 'signal', 'sky']]
         
         global live
         if live:
             ORDER = neopixel.GRB
-            self.lights = neopixel.NeoPixel(board.D18, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
+            try:
+                pinname = getattr(board,'D'+str(self.pin))
+                self.lights = neopixel.NeoPixel(pinname, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
+            except Exception as e:
+                logging.error('Error setting up lights: ' + str(e))
+                logging.error('Stopping Program')
         else:
             self.lights = [(0,0,0)] * sum(numLeds)
 
         # tuple ranges for each section so we can pass them to sequences
-        if self.config['groundFirst']:
+        if self.groundfirst:
             self.ground = (0, numLeds[0])
             self.signal = (numLeds[0], numLeds[0]+numLeds[1])
             self.sky = (numLeds[0]+numLeds[1], sum(numLeds))
@@ -74,7 +90,7 @@ class Pulse:
         # list of currently active sequences
         self.activeSequences = [None, None, None]
 
-        self.framedelay = 1 / int(self.config['framerate'])
+        self.framedelay = 1 / int(self.framerate)
 
         # Create an empty queue for our instructions to be stored in
         self.queue = asyncio.Queue(maxsize=50)
