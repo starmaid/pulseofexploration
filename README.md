@@ -38,13 +38,15 @@ There are two options for wiring the lights. Running power through the Raspberry
 
 ![](./docs/wiringB.png)
 
+This wiring pattern allows you to turn the lights off without turning off the Pi, which is handy if you have, say, a lightswitch tied to an outlet (like I do). Pulling the plug on a running RPi is never a good idea, as it can corrupt your filesystem and youll have to re-setup the SD card. Its always good practice to `sudo poweroff` from the command line.
+
 | Board  | Power Draw with mild load (mA) | Lights you could power through the board with a 2 A Supply |
 | ------ | --------------- | ---------------------- |
 | Zero W | 300     | 30 |
 | 3 B+   | 700     | 22 |
 | 4 B    | 800     | 20 |
 
-If you are integrating this with another project, remember that the WS2812b lights need a pin with PCM (or PWM). By default the config uses `GPIO 18`, but see the [pinout](https://pinout.xyz/pinout/pcm#) for other options.
+If you are integrating this with another project, remember that the WS2812b lights need a pin that can output a PCM (or PWM, as I learned it) signal. By default the config uses `GPIO 18`, but see the [pinout](https://pinout.xyz/pinout/pcm#) for other options.
 
 ### Parts
 

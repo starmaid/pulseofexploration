@@ -71,6 +71,9 @@ class Pulse:
         if live:
             ORDER = neopixel.GRB
             try:
+                if self.pin not in [18,19,20,21]:
+                    raise Exception('pin does not support PCM')
+
                 pinname = getattr(board,'D'+str(self.pin))
                 self.lights = neopixel.NeoPixel(pinname, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
             except Exception as e:
@@ -248,4 +251,4 @@ if __name__ == "__main__":
         asyncio.get_event_loop().run_until_complete(p.start())
     else:
         # But on windows with python 3.10 gives depreciation warning
-        asyncio.run_until_complete(p.start())
+        asyncio.run(p.start())
