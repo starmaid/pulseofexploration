@@ -39,52 +39,81 @@ class DSNQuery:
         # find all down and upsignals
         # add each found spaceship and power/frequency to a list
         # translate shortnames to friendlynames
-
         signals = {}
 
-        """
-        # this part looks at signals between dishes and probes
-        # look at this later to see if you want to look at frequency and power
-        # for now, its omitted because i dont want to do it.
-        for signal in comms.findall("./dish/upSignal") + comms.findall("./dish/downSignal"):
-            sDict = {}
-            name = signal.attrib['spacecraft']
-            if name == "":
-                continue
+        for dish in comms.findall('./dish'):
+            for target in dish.findall('./target'):
+                sDict = {}
+                name = target.attrib['name'].lower()
+                if name == "":
+                    continue
+                
+                sDict['name'] = name
+                try:
+                    sDict['friendlyName'] = self.friendlyTranslator[name]
+                except:
+                    #print("key " + name + " not found")
+                    continue
             
-            sDict['name'] = name
-            sDict['friendlyName'] = self.friendlyTranslator[name.lower()]
-            sDict['power'] = signal.attrib['power'] # in dB
-            sDict['frequency'] = signal.attrib['frequency'] # in hertz
-            signals[name] = sDict
-        """
+                sDict['range'] = float(target.attrib['uplegRange']) # in km
+                sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
+                signals[name] = sDict
 
-        for target in comms.findall("./dish/target"):
-            sDict = {}
-            name = target.attrib['name'].lower()
-            if name == "":
-                continue
-            
-            sDict['name'] = name
-            try:
-                sDict['friendlyName'] = self.friendlyTranslator[name]
-            except:
-                #print("key " + name + " not found")
-                continue
-            
-            sDict['range'] = float(target.attrib['uplegRange']) # in km
-            sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
-            signals[name] = sDict
+                for signal in dish.findall('./downSignal'):
+                    if signal.attrib['signalType'] != 'none':
+                        if signal.attrib['spacecraft'].lower() == name:
+                            sDict['down'] = True
+                            try:
+                                sDict['power'] = float(signal.attrib['power'])
+                            except ValueError:
+                                sDict['power'] = None
+                            
+                            try:
+                                sDict['dataRate'] = float(signal.attrib['dataRate'])
+                            except ValueError:
+                                sDict['dataRate'] = None
+                            
+                            try:
+                                sDict['frequency'] = float(signal.attrib['frequency'])
+                            except ValueError:
+                                sDict['frequency'] = None
+                        
+                if 'down' not in sDict.keys():
+                    sDict['down'] = False
 
+                for signal in dish.findall('./upSignal'):
+                    if signal.attrib['signalType'] != 'none':
+                        if signal.attrib['spacecraft'].lower() == name:
+                            sDict['up'] = True
+                            try:
+                                sDict['power'] = float(signal.attrib['power'])
+                            except ValueError:
+                                sDict['power'] = None
+                            
+                            try:
+                                sDict['dataRate'] = float(signal.attrib['dataRate'])
+                            except ValueError:
+                                sDict['dataRate'] = None
+                            
+                            try:
+                                sDict['frequency'] = float(signal.attrib['frequency'])
+                            except ValueError:
+                                sDict['frequency'] = None
+                            
+                if 'up' not in sDict.keys():
+                    sDict['up'] = False
+                
+                sDict['range'] = float(target.attrib['uplegRange']) # in km
+                sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
+                sDict['dish'] = dish.attrib['name']
+                signals[name] = sDict
         
-        #print(signals)
         # remove things we dont care about
         for i in ["dsn", "dss", "test", "testing", "Testing"]:
             try:
                 signals.pop(i)
             except:
                 pass
-        #print(signals)
         
         # do we care about timestamps?
         #ts = int(comms.findall("timestamp")[0].text) / 1000
