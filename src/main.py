@@ -142,17 +142,17 @@ class Pulse:
                             try:
                                 # Attempt to load the class from lights.py
                                 classname = getattr(lights,locname)
-                                newSequence = classname(self.lights,self.sky)
+                                newSequence = classname(self.lights,self.sky, ship=q.activeSignals[s])
                                 logging.debug('Found LightSequence class ', classname)
                             except AttributeError:
                                 # If that that class doesnt exist, load that image
                                 logging.debug('LightSequence Class not found. Loading image file')
-                                newSequence = lights.Img(self.lights,self.sky,self.themeName,locname)
+                                newSequence = lights.Img(self.lights,self.sky,self.themeName,locname,ship=q.activeSignals[s])
                             
 
                         else:
                             logging.debug('%s not found in config, loading DeepSpace',s)
-                            newSequence = lights.DeepSpace(self.lights,self.sky)
+                            newSequence = lights.DeepSpace(self.lights,self.sky,ship=q.activeSignals[s])
 
                         await self.queue.put(newSequence)
 
@@ -189,7 +189,7 @@ class Pulse:
                     self.activeSequences = [obj,obj,obj]
                 else:
                     self.activeSequences[2] = obj
-                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal)
+                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship)
                     print('\nNew sequence')
                     # set the sky as the new sky
                     # set the signal parameters and add

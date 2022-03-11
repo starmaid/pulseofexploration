@@ -18,9 +18,10 @@ IMAGESPATH = "./data/"
 class LightSequence:
     """controls what colors are sent to the array of pixels"""
 
-    def __init__(self, lights, lRange, distance=None, strength=None):
+    def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
         self.lights = lights
         self.lRange = lRange
+        self.ship = ship
         self.distance = distance
         self.strength = strength
         self.stop = False
@@ -82,8 +83,8 @@ class Stop():
 class Idle(LightSequence):
     """Sequence that turns the lights off."""
 
-    def __init__(self, lights, lRange, distance=None, strength=None):
-        super().__init__(lights, lRange, distance, strength)
+    def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
+        super().__init__(lights, lRange, ship, distance, strength)
 
     def run(self):
         """Fill section of the lights array with (0,0,0)"""
@@ -97,8 +98,8 @@ class Idle(LightSequence):
 class Transmission(LightSequence):
     """Sequence that plays for the signal"""
 
-    def __init__(self, lights, lRange, distance=None, strength=None):
-        super().__init__(lights, lRange, distance, strength)
+    def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
+        super().__init__(lights, lRange, ship, distance, strength)
         filename = 'Transmission.png'
         self.stop = not self.openImg(filename)
 
@@ -109,8 +110,8 @@ class Transmission(LightSequence):
 class IdleSky(LightSequence):
     """Twinkling stars for the idle sky"""
 
-    def __init__(self, lights, lRange, distance=None, strength=None):
-        super().__init__(lights, lRange, distance, strength)
+    def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
+        super().__init__(lights, lRange, ship, distance, strength)
         
     
     def run(self):
@@ -137,8 +138,8 @@ class IdleSky(LightSequence):
 
 class DeepSpace(LightSequence):
     """deep space twinkle"""
-    def __init__(self, lights, lRange, distance=None, strength=None):
-        super().__init__(lights, lRange, distance, strength)
+    def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
+        super().__init__(lights, lRange, ship, distance, strength)
     
     def run(self):
         """FASTER turns one random light on, fades every light that is currently on"""
@@ -176,8 +177,8 @@ class Ground(LightSequence):
         return True
 
 class Img(LightSequence):
-    def __init__(self, lights, lRange, theme, filename, distance=None, strength=None):
-        super().__init__(lights, lRange, distance, strength)
+    def __init__(self, lights, lRange, theme, filename, ship=None, distance=None, strength=None):
+        super().__init__(lights, lRange, ship, distance, strength)
         self.stop = not self.openImg(theme + '/' + filename + '.png')
     
     def run(self):
