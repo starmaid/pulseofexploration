@@ -16,11 +16,11 @@ Check out the README files in each theme folder!
 
 ## Where are you in development??
 
-Variable brightness for LEDS
+make transmission real
 
 make a setup script for the user
 
-make a cool ground, reactive to time of day
+make a cool ground, reactive to time of day/location
 
 ## How to Build your Own
 

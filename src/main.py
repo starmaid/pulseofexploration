@@ -43,19 +43,28 @@ class Pulse:
         except Exception as e:
             logging.error('Error loading config file: ' + str(e))
             logging.error('Stopping Program')
-            raise
+            raise e
             
         try:
             # Loading all values from config
-            self.themeName = self.config['theme']
             self.lightsegments = self.config['lights']
-            self.framerate = self.config['framerate']
             self.pin = self.config['pin']
+            self.brightness = self.config['brightness']
+            self.rgbw = self.config['RGBW']
             self.groundfirst = self.config['groundFirst']
+            self.framerate = self.config['framerate']
+            self.themeName = self.config['theme']
         except Exception as e:
             logging.error('Value not found in config file: ' + str(e))
             logging.error('Stopping Program')
-            raise
+            raise e
+        
+        if self.brightness > 100 or self.brightness < 0:
+            logging.warning('Brightness not between 0 and 100: ' + str(self.brightness))
+            logging.warnin('Setting brightness to 20%')
+            self.brightness = 20
+
+        self.brightness = self.brightness / 100
 
         try:
             with open("./data/" + str(self.themeName) + "/theme.json","r") as f2:
@@ -63,22 +72,28 @@ class Pulse:
         except Exception as e:
             logging.error('Error loading theme: ' + str(e))
             logging.error('Stopping Program')
-            raise
+            raise e
 
         numLeds = [self.lightsegments[a] for a in ['ground', 'signal', 'sky']]
         
         global live
         if live:
-            ORDER = neopixel.GRB
+            if self.rgbw:
+                order = neopixel.GRBW
+            else:
+                order = neopixel.GRB
             try:
                 if self.pin not in [18,19,20,21]:
                     raise Exception('pin does not support PCM')
 
                 pinname = getattr(board,'D'+str(self.pin))
-                self.lights = neopixel.NeoPixel(pinname, sum(numLeds), brightness=0.2, auto_write=False, pixel_order=ORDER)
+                self.lights = neopixel.NeoPixel(pinname, sum(numLeds), 
+                        brightness=self.brightness, auto_write=False, 
+                        pixel_order=order)
             except Exception as e:
                 logging.error('Error setting up lights: ' + str(e))
                 logging.error('Stopping Program')
+                raise e
         else:
             self.lights = [(0,0,0)] * sum(numLeds)
 
@@ -142,12 +157,13 @@ class Pulse:
                             try:
                                 # Attempt to load the class from lights.py
                                 classname = getattr(lights,locname)
-                                newSequence = classname(self.lights,self.sky, ship=q.activeSignals[s])
+                                newSequence = classname(self.lights, self.sky, ship=q.activeSignals[s])
                                 logging.debug('Found LightSequence class ', classname)
                             except AttributeError:
                                 # If that that class doesnt exist, load that image
                                 logging.debug('LightSequence Class not found. Loading image file')
-                                newSequence = lights.Img(self.lights,self.sky,self.themeName,locname,ship=q.activeSignals[s])
+                                newSequence = lights.Img(self.lights, self.sky, 
+                                        self.themeName,locname,ship=q.activeSignals[s])
                             
 
                         else:
@@ -189,6 +205,7 @@ class Pulse:
                     self.activeSequences = [obj,obj,obj]
                 else:
                     self.activeSequences[2] = obj
+                    print(obj.ship)
                     self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship)
                     print('\nNew sequence')
                     # set the sky as the new sky

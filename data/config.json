@@ -5,7 +5,8 @@
         "sky": 10
     },
     "pin": 18,
-    "rgb": true,
+    "brightness": 50,
+    "RGBW": false,
     "groundFirst": true,
     "framerate": 10,
     "theme": "Default"

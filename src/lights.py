@@ -100,11 +100,11 @@ class Transmission(LightSequence):
 
     def __init__(self, lights, lRange, ship=None, distance=None, strength=None):
         super().__init__(lights, lRange, ship, distance, strength)
-        filename = 'Transmission.png'
-        self.stop = not self.openImg(filename)
+        
 
     def run(self):
-        return self.playImg()
+
+        return 
 
 
 class IdleSky(LightSequence):
