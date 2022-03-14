@@ -1,5 +1,6 @@
 # This file controls the low level light stuff
 import asyncio
+from pickletools import long4
 import random
 import logging
 
@@ -101,15 +102,17 @@ class Transmission(LightSequence):
         # set parameters for how things should be represented
 
         # up vs down determines which direction/sign stuff
-        if ship['down']:
-            self.dir = 'down'
+        if ship['down'] and ship['up']:
+            self.dir = 'both'
         elif ship['up']:
             self.dir = 'up'
+        elif ship['down']:
+            self.dir = 'down'
         else:
             # i hope we never get here
             self.dir = None
 
-
+        print(self.dir)
         # round trip light time (s)
         # from 0 to 200000 (leo to voyager) with -1.0 as None
         # probably do some log scaling
@@ -122,20 +125,26 @@ class Transmission(LightSequence):
         # power
         # down values are in dBm, up in kW, keyerror if none
         # change brightness of lights
-        if 'power' in self.ship.keys():
-            if self.dir == 'down':
+        if 'power' in self.ship.keys() and self.ship['power'] is not None:
+            if self.ship['power'] == 0:
+                self.power = 0.2
+            elif self.dir == 'down' and not self.ship['up']:
                 self.power = 10 ** ((self.ship['power'] - 30) / 10) / 1000
+                # now its gunna be super small soooo
+                self.power *= 10 ** 10
             else:
                 self.power = self.ship['power']
         else:
             self.power = 0.2
 
+        print(self.power)
+
 
         # frequency
         # up is in Hz, down is in MHz, keyerror if none
         # change spacing of lights
-        if 'frequency' in self.ship.keys():
-            if self.dir == 'up':
+        if 'frequency' in self.ship.keys() and self.ship['frequency'] is not None:
+            if self.dir != 'down':
                 self.frequency = self.ship['frequency'] / 1000000000
             else:
                 self.frequency = self.ship['frequency']
@@ -145,6 +154,20 @@ class Transmission(LightSequence):
 
         # send 10 beams or something idk
         # this could be datarate
+        intensity = self.vmap(self.power,0,30,10,255)
+        color = (intensity, intensity, intensity)
+        off = (0,0,0)
+        delay = self.vmap(self.rtlt,0,200000,1,10)
+        spacing = 11 - self.vmap(self.frequency,0,100000,1,10)
+
+        lset = []
+        for i in range(0,10):
+            lset.append(color)
+            if i != 9:
+                for i in range(0,spacing):
+                    lset.append(off)
+        
+        print(lset)
 
 
 

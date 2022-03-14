@@ -16,7 +16,10 @@ Check out the README files in each theme folder!
 
 ## Where are you in development??
 
-make transmission real
+working on transmission and the numbers are all fucked up
+
+- some transmissions are simultaneous up and down
+- things are totally on log scales
 
 make a setup script for the user
 

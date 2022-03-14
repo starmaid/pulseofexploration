@@ -59,28 +59,6 @@ class DSNQuery:
                 sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
                 signals[name] = sDict
 
-                for signal in dish.findall('./downSignal'):
-                    if signal.attrib['signalType'] != 'none':
-                        if signal.attrib['spacecraft'].lower() == name:
-                            sDict['down'] = True
-                            try:
-                                sDict['power'] = float(signal.attrib['power'])
-                            except ValueError:
-                                sDict['power'] = None
-                            
-                            try:
-                                sDict['dataRate'] = float(signal.attrib['dataRate'])
-                            except ValueError:
-                                sDict['dataRate'] = None
-                            
-                            try:
-                                sDict['frequency'] = float(signal.attrib['frequency'])
-                            except ValueError:
-                                sDict['frequency'] = None
-                        
-                if 'down' not in sDict.keys():
-                    sDict['down'] = False
-
                 for signal in dish.findall('./upSignal'):
                     if signal.attrib['signalType'] != 'none':
                         if signal.attrib['spacecraft'].lower() == name:
@@ -102,6 +80,28 @@ class DSNQuery:
                             
                 if 'up' not in sDict.keys():
                     sDict['up'] = False
+                
+                for signal in dish.findall('./downSignal'):
+                    if signal.attrib['signalType'] != 'none':
+                        if signal.attrib['spacecraft'].lower() == name:
+                            sDict['down'] = True
+                            try:
+                                sDict['power'] = float(signal.attrib['power'])
+                            except ValueError:
+                                sDict['power'] = None
+                            
+                            try:
+                                sDict['dataRate'] = float(signal.attrib['dataRate'])
+                            except ValueError:
+                                sDict['dataRate'] = None
+                            
+                            try:
+                                sDict['frequency'] = float(signal.attrib['frequency'])
+                            except ValueError:
+                                sDict['frequency'] = None
+                        
+                if 'down' not in sDict.keys():
+                    sDict['down'] = False
                 
                 sDict['range'] = float(target.attrib['uplegRange']) # in km
                 sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
