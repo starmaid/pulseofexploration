@@ -57,7 +57,11 @@ class LightSequence:
     def logmap(self, x, inMin, inMax, outMin, outMax):
         """This is the map() function from Arduino. 
         Im using it to sample from the image rows."""
-        x = m.log10(x)
+        try:
+            x = m.log10(x)
+        except:
+            print('math exception ' + str(x))
+            x = 1
         inMin = m.log10(inMin)
         inMax = m.log10(inMax)
 
@@ -133,45 +137,59 @@ class Transmission(LightSequence):
             self.rtlt = self.ship['rtlt']
 
 
-        # power
-        # down values are in dBm, up in kW, keyerror if none
-        # change brightness of lights
-        
-        
-        if 'power' in self.ship.keys() and self.ship['power'] is not None:
-            if self.ship['power'] == 0:
-                self.power = 0.2
-            elif self.dir == 'down' and not self.ship['up']:
-                self.power = 10 ** ((self.ship['power'] - 30) / 10) / 1000
+        if self.dir in ['down', 'both']:
+            # power
+            # down values are in dBm, keyerror if none
+            # change brightness of lights
+            print('power (dBm): ' + str(self.ship['down_power']))
+            if self.ship['down_power'] == 0:
+                self.power = 1
+            else:
+                self.power = 10 ** ((self.ship['down_power'] - 30) / 10) / 1000
                 # now its gunna be super small soooo
-                self.power *= 10 ** 10
+                print('power (KW): ' + str(self.power))
+                self.power = self.power ** 22
+                if self.power < 1:
+                    self.power = 1
+            
+            # frequency
+            # down is in MHz, keyerror if none
+            # change spacing of lights
+            if 'down_frequency' in self.ship.keys() and self.ship['down_frequency'] is not None:
+                self.frequency = self.ship['down_frequency'] / 1000000000
             else:
-                self.power = self.ship['power']
-        else:
-            self.power = 0.2
+                self.frequency = 200
 
-        print(self.power)
-
-
-        # frequency
-        # up is in Hz, down is in MHz, keyerror if none
-        # change spacing of lights
-        if 'frequency' in self.ship.keys() and self.ship['frequency'] is not None:
-            if self.dir != 'down':
-                self.frequency = self.ship['frequency'] / 1000000000
+        elif self.dir == 'up':
+            # power
+            # up in kW, keyerror if 
+            if self.ship['up_power'] == 0:
+                self.power = 0.2
             else:
-                self.frequency = self.ship['frequency']
+                self.power = self.ship['up_power']
+
+            # frequency
+            # up is in Hz, keyerror if none
+            if 'up_frequency' in self.ship.keys() and self.ship['up_frequency'] is not None:
+                self.frequency = self.ship['up_frequency']
+            else: 
+                self.frequency = 200
         else:
+            self.power = 5
             self.frequency = 200
+            
+        print(self.ship['name'])
+        print(self.power)
+        print(self.frequency)
 
 
         # send 10 beams or something idk
         # this could be datarate
-        intensity = self.logmap(self.power,0,30,10,255)
+        intensity = self.logmap(self.power,1,30,10,255)
         color = (intensity, intensity, intensity)
         off = (0,0,0)
-        delay = self.linmap(self.rtlt,0,200000,1,10)
-        spacing = 11 - self.linmap(self.frequency,0,100000,1,10)
+        delay = self.logmap(self.rtlt,1,200000,1,10)
+        spacing = 11 - self.logmap(self.frequency,1,100000,1,10)
 
         lset = []
         for i in range(0,10):
