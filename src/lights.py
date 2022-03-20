@@ -3,6 +3,7 @@ import asyncio
 from pickletools import long4
 import random
 import logging
+import math as m
 
 from PIL import Image
 
@@ -44,12 +45,22 @@ class LightSequence:
             return False
         rpix = list(image.getdata())[(width*row):(width*(row+1))]
         #print([x[0] for x in rpix])
-        rout = [rpix[self.vmap(n,0,numPixels,0,width)][0:3] for n in range(0,numPixels)]
+        rout = [rpix[self.linmap(n,0,numPixels,0,width)][0:3] for n in range(0,numPixels)]
         return rout
 
-    def vmap(self, x, inMin, inMax, outMin, outMax):
+    def linmap(self, x, inMin, inMax, outMin, outMax):
         """This is the map() function from Arduino. 
         Im using it to sample from the image rows."""
+        y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+        return int(y)
+
+    def logmap(self, x, inMin, inMax, outMin, outMax):
+        """This is the map() function from Arduino. 
+        Im using it to sample from the image rows."""
+        x = m.log10(x)
+        inMin = m.log10(inMin)
+        inMax = m.log10(inMax)
+
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
         return int(y)
 
@@ -125,6 +136,8 @@ class Transmission(LightSequence):
         # power
         # down values are in dBm, up in kW, keyerror if none
         # change brightness of lights
+        
+        
         if 'power' in self.ship.keys() and self.ship['power'] is not None:
             if self.ship['power'] == 0:
                 self.power = 0.2
@@ -154,11 +167,11 @@ class Transmission(LightSequence):
 
         # send 10 beams or something idk
         # this could be datarate
-        intensity = self.vmap(self.power,0,30,10,255)
+        intensity = self.logmap(self.power,0,30,10,255)
         color = (intensity, intensity, intensity)
         off = (0,0,0)
-        delay = self.vmap(self.rtlt,0,200000,1,10)
-        spacing = 11 - self.vmap(self.frequency,0,100000,1,10)
+        delay = self.linmap(self.rtlt,0,200000,1,10)
+        spacing = 11 - self.linmap(self.frequency,0,100000,1,10)
 
         lset = []
         for i in range(0,10):

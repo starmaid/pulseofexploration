@@ -206,7 +206,7 @@ class Pulse:
                 else:
                     self.activeSequences[2] = obj
                     try:
-                        print(obj.ship['power'])
+                        print(obj.ship['up_power'])
                     except:
                         pass
                     self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship)
