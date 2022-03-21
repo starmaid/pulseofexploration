@@ -47,7 +47,7 @@ class DSNQuery:
                 name = target.attrib['name'].lower()
                 if name == "":
                     continue
-                
+
                 sDict['name'] = name
                 try:
                     sDict['friendlyName'] = self.friendlyTranslator[name]
@@ -76,6 +76,9 @@ class DSNQuery:
                             
                 if 'up' not in sDict.keys():
                     sDict['up'] = False
+                    sDict['up_power'] = None
+                    sDict['up_dataRate'] = None
+                    sDict['up_frequency'] = None
                 
                 for signal in dish.findall('./downSignal'):
                     if signal.attrib['signalType'] != 'none':
@@ -98,7 +101,13 @@ class DSNQuery:
                         
                 if 'down' not in sDict.keys():
                     sDict['down'] = False
+                    sDict['down_power'] = None
+                    sDict['down_dataRate'] = None
+                    sDict['down_frequency'] = None
                 
+                if (not sDict['down']) and (not sDict['up']):
+                    continue
+
                 sDict['range'] = float(target.attrib['uplegRange']) # in km
                 sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
                 sDict['dish'] = dish.attrib['name']

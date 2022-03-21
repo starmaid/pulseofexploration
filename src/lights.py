@@ -128,6 +128,18 @@ class Transmission(LightSequence):
             self.dir = None
 
         print(self.dir)
+
+        with open('./dataout.csv', 'a') as f:
+            line = ''
+            for field in ['name', 'rtlt', 'up', 'up_power', 'up_dataRate', 'up_frequency', 'down', 'down_power', 'down_dataRate', 'down_frequency']:
+                try:
+                    line += str(self.ship[field])
+                except:
+                    line += 'None'
+                line += ', '
+            line += '\n'
+            f.writelines(line)
+
         # round trip light time (s)
         # from 0 to 200000 (leo to voyager) with -1.0 as None
         # probably do some log scaling
