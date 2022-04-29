@@ -112,9 +112,10 @@ class Idle(LightSequence):
 class Transmission(LightSequence):
     """Sequence that plays for the signal"""
 
-    def __init__(self, lights, lRange, ship=None):
+    def __init__(self, lights, lRange, ship=None, groundfirst=True):
         super().__init__(lights, lRange, ship)
         # set parameters for how things should be represented
+        self.groundfirst = groundfirst
 
         # up vs down determines which direction/sign stuff
         if ship['down'] and ship['up']:
@@ -244,8 +245,27 @@ class Transmission(LightSequence):
                     lset.append(off)
         
         print(lset)
+        self.lset = lset
+        self.progress = 0
 
     def run(self):
+        # slide the lset across the thing
+        # in the direction
+        if self.groundfirst:
+            d = 1
+        else:
+            d = -1
+        
+        if self.dir != 'up':
+            d = d * -1
+        
+        # in a groundfirst up, the indexes increase
+        # position of first light = d*progress
+        # position of second light = d*progress - (d*1)
+        # position of third light = d*progress - (d*2)
+        for i in range(self.lRange[0],self.lRange[1]):
+            #self.lights[]
+            pass
 
 
         self.progress += 1

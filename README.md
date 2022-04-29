@@ -16,7 +16,7 @@ Check out the README files in each theme folder!
 
 ## Where are you in development??
 
-Now that the signal conversion works and has reasonable values, we need to display lset.
+Now that the signal conversion works and has reasonable values, we need to display lset. I want to find an elegant math solution here, because up/down on groundfirst/skyfirst setups get complex.
 
 make a setup script for the user
 
