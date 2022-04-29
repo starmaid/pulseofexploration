@@ -16,11 +16,7 @@ Check out the README files in each theme folder!
 
 ## Where are you in development??
 
-Thinking about restructuring how updates are passed to the main program. currently they only get the initial contact, but an uplink may commence later and not be seen. 
-
-Thinking about an array of all signals, and have a 'new' flag when the up or down signal turns on, as well as when the ship is initially added.
-
-establish good limits for the logmapping of power and stuff
+Now that the signal conversion works and has reasonable values, we need to display lset.
 
 make a setup script for the user
 

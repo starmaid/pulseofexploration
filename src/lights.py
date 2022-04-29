@@ -129,16 +129,16 @@ class Transmission(LightSequence):
 
         print(self.dir)
 
-        with open('./dataout.csv', 'a') as f:
-            line = ''
-            for field in ['name', 'rtlt', 'up', 'up_power', 'up_dataRate', 'up_frequency', 'down', 'down_power', 'down_dataRate', 'down_frequency']:
-                try:
-                    line += str(self.ship[field])
-                except:
-                    line += 'None'
-                line += ', '
-            line += '\n'
-            f.writelines(line)
+        #with open('./dataout.csv', 'a') as f:
+        #    line = ''
+        #    for field in ['name', 'rtlt', 'up', 'up_power', 'up_dataRate', 'up_frequency', 'down', 'down_power', 'down_dataRate', 'down_frequency']:
+        #        try:
+        #            line += str(self.ship[field])
+        #        except:
+        #            line += 'None'
+        #        line += ', '
+        #    line += '\n'
+        #    f.writelines(line)
 
         # round trip light time (s)
         # from 0 to 200000 (leo to voyager) with -1.0 as None
@@ -153,6 +153,15 @@ class Transmission(LightSequence):
             # power
             # down values are in dBm, keyerror if none
             # change brightness of lights
+            # 2.426920219828798e-22
+            # 3.9451198380957787e-22
+            # 7.882799856329301e-19
+            # 1.1014518076312253e-17
+            # 1.5212020429833592e-18
+            # 1.0274246946691201e-17
+            # 1.263283139977561e-18
+            # 4.851862671789916e-18
+            # 1.5398481656110987e-18
             print('power (dBm): ' + str(self.ship['down_power']))
             if self.ship['down_power'] == 0:
                 self.power = 1
@@ -160,35 +169,58 @@ class Transmission(LightSequence):
                 self.power = 10 ** ((self.ship['down_power'] - 30) / 10) / 1000
                 # now its gunna be super small soooo
                 print('power (KW): ' + str(self.power))
-                self.power = self.power ** 22
+                self.power = self.power * 1e22
                 if self.power < 1:
                     self.power = 1
             
             # frequency
             # down is in MHz, keyerror if none
             # change spacing of lights
+            # 8.420392184740615
+            # 8.445743892618303
+            # 2.270410574663693
+            # 2.281895275773722
+            # 8.439690878445852
+            # 2.2450060852689053
+            # 2.2783730883865863
+            # 8.446086418383214
+            # 8.439636400350302
             if 'down_frequency' in self.ship.keys() and self.ship['down_frequency'] is not None:
                 self.frequency = self.ship['down_frequency'] / 1000000000
             else:
-                self.frequency = 200
+                self.frequency = 8
 
         elif self.dir == 'up':
             # power
             # up in kW, keyerror if 
+            # 4.9
+            # 0.26
+            # 1.8
+            # 9.94
+            # 0.21
+            # 10.24
             if self.ship['up_power'] == 0:
-                self.power = 0.2
+                self.power = 0.2 * 1000
             else:
-                self.power = self.ship['up_power']
+                self.power = self.ship['up_power'] * 1000
 
             # frequency
             # up is in Hz, keyerror if none
+            # 7188.0
+            # 7182.0
+            # 7156.0
+            # 2067.0
+            # 2090.0
+            # 7187.0
+            # 2091.0
+            # 2039.0
             if 'up_frequency' in self.ship.keys() and self.ship['up_frequency'] is not None:
-                self.frequency = self.ship['up_frequency']
+                self.frequency = self.ship['up_frequency'] / 1000
             else: 
-                self.frequency = 200
+                self.frequency = 4
         else:
-            self.power = 5
-            self.frequency = 200
+            self.power = 1000
+            self.frequency = 5
             
         print(self.ship['name'])
         print(self.power)
@@ -197,11 +229,12 @@ class Transmission(LightSequence):
 
         # send 10 beams or something idk
         # this could be datarate
-        intensity = self.logmap(self.power,1,30,10,255)
+        # power 
+        intensity = self.logmap(self.power,1,100000,20,255)
         color = (intensity, intensity, intensity)
         off = (0,0,0)
         delay = self.logmap(self.rtlt,1,200000,1,10)
-        spacing = 11 - self.logmap(self.frequency,1,100000,1,10)
+        spacing = 11 - self.logmap(self.frequency,1,10,1,10)
 
         lset = []
         for i in range(0,10):
@@ -211,8 +244,6 @@ class Transmission(LightSequence):
                     lset.append(off)
         
         print(lset)
-
-
 
     def run(self):
 

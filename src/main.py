@@ -143,7 +143,7 @@ class Pulse:
 
         while running:
             try:
-                newsignals = q.getNew()
+                newsignals = q.getNew().keys()
 
                 if len(newsignals) > 0:
                     # put the new objects in

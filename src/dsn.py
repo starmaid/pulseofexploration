@@ -70,7 +70,7 @@ class DSNQuery:
                                 sDict['up_dataRate'] = None
                             
                             try:
-                                sDict['up_'] = float(signal.attrib['frequency'])
+                                sDict['up_frequency'] = float(signal.attrib['frequency'])
                             except ValueError:
                                 sDict['up_frequency'] = None
                             
@@ -129,14 +129,20 @@ class DSNQuery:
     def getNew(self):
         signals = self.poll()
         
-        newsignals = []
+        newsignals = {}
         
         # Add any new signal we just saw to the active ones
         for s in signals.keys():
             if s not in self.activeSignals.keys():
-                newsignals.append(s)
+                newsignals[s] = signals[s]
                 self.activeSignals[s] = signals[s]
+            else:
+                if len(signals[s]) != len(self.activeSignals[s]):
+                    newsignals[s] = signals[s]
+                    self.activeSignals[s] = signals[s]
         
+
+
         # Remove signal if it is no longer active
         removenames = []
         for s in self.activeSignals.keys():
