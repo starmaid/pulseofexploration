@@ -1,9 +1,10 @@
 # This file controls the low level light stuff
 import asyncio
-from pickletools import long4
 import random
 import logging
 import math as m
+import requests
+from datetime import datetime
 
 from PIL import Image
 
@@ -370,10 +371,57 @@ class Ground(LightSequence):
 
     def __init__(self, lights, lRange):
         super().__init__(lights, lRange)
+        self.green = (0,255,0)
+        self.blue  = (30,130,190)
+        self.orange= (245,140,0)
+        self.night = (0,20,100)
+
+        # set lat long
+
+        # set radius to apply effects
+
+    
+    def updateDay(self):
+        # make request
+
+        endpoint = 'https://api.sunrise-sunset.org/json'
+        data = {
+            'lat':36,
+            'lng':102,
+            'date':'YYYY-MM-DD',
+            'formatted':0
+            }
+
+        # parse as some simple representation
+        
+        pass
     
     def run(self):
+        # what daytime is it
+        now = datetime.now()
+
+        # do we have data for today?
+        # if no, get the next events
+        # if yes, continue
+
+        # apply rules to determine next pixel
+        # before sunrise?
+            #radius to sunrise
+        # after sunrise, before sunset?
+            # radius to sunset
+        # after sunset?
+            # night
+        
+        # apply noise to the pixel to vary it
+
+        # fifo that pixel into the list
+
+        # render all pixels
+
+
         if self.progress == 0:
             self.lights[self.lRange[0]:self.lRange[1]] = [(0,255,0) for i in range(self.lRange[0],self.lRange[1])]
+            self.progress += 1
         return True
 
 class Img(LightSequence):
