@@ -209,7 +209,7 @@ class Pulse:
                         print(obj.ship['up_power'])
                     except:
                         pass
-                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship)
+                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
                     print('\nNew sequence')
                     # set the sky as the new sky
                     # set the signal parameters and add

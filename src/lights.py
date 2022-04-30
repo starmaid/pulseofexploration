@@ -234,7 +234,7 @@ class Transmission(LightSequence):
         intensity = self.logmap(self.power,1,100000,20,255)
         color = (intensity, intensity, intensity)
         off = (0,0,0)
-        delay = self.logmap(self.rtlt,1,200000,1,10)
+        self.delay = self.logmap(self.rtlt,1,200000,1,10)
         spacing = 11 - self.logmap(self.frequency,1,10,1,10)
 
         lset = []
@@ -251,6 +251,11 @@ class Transmission(LightSequence):
     def run(self):
         # slide the lset across the thing
         # in the direction
+
+        if self.progress % self.delay != 0:
+            self.progress += 1
+            return True
+
         if self.groundfirst:
             d = 1
         else:
@@ -259,17 +264,47 @@ class Transmission(LightSequence):
         if self.dir != 'up':
             d = d * -1
         
-        # in a groundfirst up, the indexes increase
-        # position of first light = d*progress
-        # position of second light = d*progress - (d*1)
-        # position of third light = d*progress - (d*2)
+        # in a groundfirst up, the indexes increase d = -1
+        # position of first light = lRange[0] + prog
+        # position of secon light = lRange[0] + prog - 1
+        # position of third light = lRange[0] + prog - 2
+
+        # groundfirst down d = 1
+        # position of first light = lRange[1] - prog
+        # position of secon light = lRange[1] - prog + 1
+        # position of third light = lRange[1] - prog + 2
+
+        # skyfirst down d = -1
+        # position of first light = lRange[0] + prog
+        # position of secon light = lRange[0] + prog - 1
+        # position of third light = lRange[0] + prog - 2
+
+        # skyfirst up d = 1
+        # position of first light = lRange[1] - prog
+        # position of secon light = lRange[1] - prog + 1
+        # position of third light = lRange[1] - prog + 2
+
+        
+        apos = {}
+        for i in range(0,len(self.lset)):
+            # for every item in the pattern, hash the color at the location it will display.
+            apos[self.lRange[0 if d < 0 else 1] - d*self.progress + d*i] = self.lset[i]
+
+        done = True
         for i in range(self.lRange[0],self.lRange[1]):
-            #self.lights[]
-            pass
+            # calculate which light position should play
+            # if none, then off
+            if i in apos.keys():
+                done = False
+                self.lights[i] = apos[i]
+            else:
+                self.lights[i] = (0,0,0)
 
-
-        self.progress += 1
-        return 
+        if done:
+            return False
+        else:
+            self.progress += 1
+            return True
 
 
 class IdleSky(LightSequence):
