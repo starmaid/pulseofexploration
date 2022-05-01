@@ -3,6 +3,7 @@ import asyncio
 import random
 import logging
 import math as m
+import numpy as np
 import requests
 from datetime import datetime, timedelta, timezone
 import json
@@ -380,6 +381,7 @@ class Ground(LightSequence):
         self.teal  = (10,160,190)
         self.orange= (245,140,0)
         self.night = (0,20,100)
+        self.white = (255,255,255)
 
         self.sunrise = None
         self.sunset  = None
@@ -387,6 +389,8 @@ class Ground(LightSequence):
 
         # set radius to apply effects
         self.radius = timedelta(hours=1)
+
+        self.delay = 10
 
         # set list 
         l = self.lRange[1]-self.lRange[0]
@@ -399,16 +403,21 @@ class Ground(LightSequence):
 
 
     
-    def updateDay(self):
+    def updateDay(self,offset=0):
         # make request
 
+        # use LOCAL day to ask the api
         endpoint = 'https://api.sunrise-sunset.org/json'
         data = {
             'lat':37.77,
             'lng':-122.41,
-            'date':self.now.strftime("%Y-%m-%d"),
+            'date':datetime.now().strftime("%Y-%m-%d"),
             'formatted':0
         }
+
+        #'lat':37.77,
+        #'lng':-122.41,
+        #'date':datetime.now().strftime("%Y-%m-%d"),
 
         """
         NOTE: All times are in UTC and summer time adjustments are not included in the returned data.
@@ -440,20 +449,63 @@ class Ground(LightSequence):
         # get the things
         self.sunrise = datetime.fromisoformat(sundata['results']['civil_twilight_begin'])
         self.sunset  = datetime.fromisoformat(sundata['results']['civil_twilight_end'])
-        pass
+
+
+    def noisepx(self, px, rx):
+        # apply color noise to a pixel
+        # up to radius rx
+        
+        # determine our radius
+        r = rx * random.random()
+
+        # determine our direction
+        s = np.random.normal(0, 1, 3)
+        norm = m.sqrt(sum(s*s))
+        d = s/norm
+
+        # multiply
+        vec = r * d
+
+        # add noise change
+        newpx = list(px) + vec
+
+        # ints capped between 0-255
+        for i in range(0,len(newpx)):
+            newpx[i] = int(newpx[i])
+            if i < 0:
+                newpx[i] = 0
+            elif i > 255:
+                newpx[i] = 255
+        
+        return tuple(newpx)
+    
+    def mixpx(self,px1,px2,percent):
+        # linear pixel mix between two colors
+        # starts at px1 and goes to px2 at 100 percent
+        # also percent should be between 0 and 1
+        mix1 = [int((1-percent)*i) for i in px1]
+        mix2 = [int(percent*i) for i in px2]
+        mixresult = tuple([mix1[i]+mix2[i] for i in range(0,len(mix1))])
+        return mixresult
     
     def run(self):
         # check if we even have a ground to update
         if self.q is None:
             return True
 
+        if self.progress % self.delay != 0:
+            self.progress += 1
+            return True
+        else:
+            self.progress = 0
+        
         # what daytime is it
         self.now = datetime.now(timezone.utc)
 
         # do we have data for today?
         # if no, get the next events
         # if yes, continue
-        if self.sunrise is None or self.now - self.sunrise > self.radius:
+        if self.sunrise is None or self.now - self.sunrise > timedelta(hours=20):
             # we need to get new ones
             self.updateDay()
         
@@ -462,18 +514,39 @@ class Ground(LightSequence):
             newpx = self.night
         elif self.sunrise - self.now > -self.radius:
             # sunrise - fade through blue
-            newpx = self.teal
+            # find what percentage along the transition we are
+            percent = (self.now - (self.sunrise - self.radius)) / (self.radius*2)
+            mix1result = self.mixpx(self.night, self.blue, percent)
+
+            # pull the color in the direction of teal
+            if percent < 0.5:
+                newpx = self.mixpx(mix1result,self.teal,percent*2)
+            else:
+                newpx = self.mixpx(mix1result,self.teal,2-(percent*2))
+            
         elif self.sunset - self.now > self.radius:
             # day
-            newpx = self.blue
+            if random.randint(0,10) <= 7:
+                newpx = self.blue
+            else:
+                newpx = self.white
+
         elif self.sunset - self.now > -self.radius:
             # sunset - fade through orange
-            newpx = self.orange
+            percent = (self.now - (self.sunset - self.radius)) / (self.radius*2)
+            mix1result = self.mixpx(self.blue, self.night, percent)
+
+            # pull the color in the direction of orange
+            if percent < 0.5:
+                newpx = self.mixpx(mix1result,self.orange,percent*2)
+            else:
+                newpx = self.mixpx(mix1result,self.orange,2-(percent*2))
         else:
             # night again
             newpx = self.night
         
         # apply noise to the pixel to vary it
+        newpx = self.noisepx(newpx,20)
 
         # fifo that pixel into the list
         while not self.q.full():

@@ -10,13 +10,13 @@ This project uses [Adafruit CircuitPython](https://learn.adafruit.com/circuitpyt
 
 WS2812 light strips and [their python library from adafruit](https://learn.adafruit.com/neopixels-on-raspberry-pi/python-usage)
 
+This project uses [the sunrise-sunset API](https://sunrise-sunset.org/api) for automatic day/night modes
+
 ## Who made these animation themes?
 
 Check out the README files in each theme folder!
 
 ## Where are you in development??
-
-make the ground noisy and dynamic
 
 make a setup script for the user
 
@@ -24,7 +24,7 @@ make a setup script for the user
 
 build the dang thing with frame
 
-update instructions
+continue writing instructions
 
 
 ## How to Build your Own
