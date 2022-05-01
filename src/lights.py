@@ -4,7 +4,9 @@ import random
 import logging
 import math as m
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+import json
+import queue
 
 from PIL import Image
 
@@ -256,6 +258,8 @@ class Transmission(LightSequence):
         if self.progress % self.delay != 0:
             self.progress += 1
             return True
+        
+        progadj = int(self.progress / self.delay)
 
         if self.groundfirst:
             d = 1
@@ -289,7 +293,7 @@ class Transmission(LightSequence):
         apos = {}
         for i in range(0,len(self.lset)):
             # for every item in the pattern, hash the color at the location it will display.
-            apos[self.lRange[0 if d < 0 else 1] - d*self.progress + d*i] = self.lset[i]
+            apos[self.lRange[0 if d < 0 else 1] - d*progadj + d*i] = self.lset[i]
 
         done = True
         for i in range(self.lRange[0],self.lRange[1]):
@@ -373,12 +377,26 @@ class Ground(LightSequence):
         super().__init__(lights, lRange)
         self.green = (0,255,0)
         self.blue  = (30,130,190)
+        self.teal  = (10,160,190)
         self.orange= (245,140,0)
         self.night = (0,20,100)
 
+        self.sunrise = None
+        self.sunset  = None
         # set lat long
 
         # set radius to apply effects
+        self.radius = timedelta(hours=1)
+
+        # set list 
+        l = self.lRange[1]-self.lRange[0]
+        if l > 1:
+            self.q = queue.Queue(l)
+        else:
+            self.q = None
+        
+        return
+
 
     
     def updateDay(self):
@@ -386,42 +404,98 @@ class Ground(LightSequence):
 
         endpoint = 'https://api.sunrise-sunset.org/json'
         data = {
-            'lat':36,
-            'lng':102,
-            'date':'YYYY-MM-DD',
+            'lat':37.77,
+            'lng':-122.41,
+            'date':self.now.strftime("%Y-%m-%d"),
             'formatted':0
-            }
+        }
+
+        """
+        NOTE: All times are in UTC and summer time adjustments are not included in the returned data.
+        {
+            "results":
+            {
+                "sunrise":"2015-05-21T05:05:35+00:00",
+                "sunset":"2015-05-21T19:22:59+00:00",
+                "solar_noon":"2015-05-21T12:14:17+00:00",
+                "day_length":51444,
+                "civil_twilight_begin":"2015-05-21T04:36:17+00:00",
+                "civil_twilight_end":"2015-05-21T19:52:17+00:00",
+                "nautical_twilight_begin":"2015-05-21T04:00:13+00:00",
+                "nautical_twilight_end":"2015-05-21T20:28:21+00:00",
+                "astronomical_twilight_begin":"2015-05-21T03:20:49+00:00",
+                "astronomical_twilight_end":"2015-05-21T21:07:45+00:00"
+            },
+            "status":"OK"
+        }
+        """
+        
+        r = requests.get(endpoint,params=data)
+        sundata = json.loads(r.content.decode('UTF-8'))
 
         # parse as some simple representation
-        
+        # convert from UTC to current time
+        sunrise = datetime.fromisoformat(sundata['results']['sunrise'])
+
+        # get the things
+        self.sunrise = datetime.fromisoformat(sundata['results']['civil_twilight_begin'])
+        self.sunset  = datetime.fromisoformat(sundata['results']['civil_twilight_end'])
         pass
     
     def run(self):
+        # check if we even have a ground to update
+        if self.q is None:
+            return True
+
         # what daytime is it
-        now = datetime.now()
+        self.now = datetime.now(timezone.utc)
 
         # do we have data for today?
         # if no, get the next events
         # if yes, continue
-
-        # apply rules to determine next pixel
-        # before sunrise?
-            #radius to sunrise
-        # after sunrise, before sunset?
-            # radius to sunset
-        # after sunset?
+        if self.sunrise is None or self.now - self.sunrise > self.radius:
+            # we need to get new ones
+            self.updateDay()
+        
+        if self.sunrise - self.now > self.radius:
             # night
+            newpx = self.night
+        elif self.sunrise - self.now > -self.radius:
+            # sunrise - fade through blue
+            newpx = self.teal
+        elif self.sunset - self.now > self.radius:
+            # day
+            newpx = self.blue
+        elif self.sunset - self.now > -self.radius:
+            # sunset - fade through orange
+            newpx = self.orange
+        else:
+            # night again
+            newpx = self.night
         
         # apply noise to the pixel to vary it
 
         # fifo that pixel into the list
+        while not self.q.full():
+            self.q.put(newpx)
+
+        self.q.get()
+        self.q.put(newpx)
 
         # render all pixels
+        q2 = queue.Queue()
+        for p in range(self.lRange[0],self.lRange[1]):
+            px = self.q.get()
+            self.lights[p] = px
+            q2.put(px)
+        
+        # put them back in the queue
+        while not self.q.full():
+            i = q2.get()
+            self.q.put(i)
 
+        self.progress += 1
 
-        if self.progress == 0:
-            self.lights[self.lRange[0]:self.lRange[1]] = [(0,255,0) for i in range(self.lRange[0],self.lRange[1])]
-            self.progress += 1
         return True
 
 class Img(LightSequence):

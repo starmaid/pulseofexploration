@@ -16,9 +16,16 @@ Check out the README files in each theme folder!
 
 ## Where are you in development??
 
+make the ground noisy and dynamic
+
 make a setup script for the user
 
-make a cool ground, reactive to time of day/location
+- add timezone setting screen
+
+build the dang thing with frame
+
+update instructions
+
 
 ## How to Build your Own
 
