@@ -20,6 +20,8 @@ Check out the README files in each theme folder!
 
 make a setup script for the user
 
+add latitude and longitude settings to the setup and parameterize them in the code
+
 build the dang thing with frame
 
 continue writing instructions

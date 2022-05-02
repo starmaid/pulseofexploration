@@ -389,7 +389,7 @@ class Ground(LightSequence):
         self.blue  = (30,130,190)
         self.teal  = (10,160,190)
         self.orange= (245,140,0)
-        self.night = (0,20,100)
+        self.night = (5,0,20)
         self.white = (255,255,255)
 
         self.sunrise = None
