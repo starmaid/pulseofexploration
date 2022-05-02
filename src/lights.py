@@ -3,7 +3,6 @@ import asyncio
 import random
 import logging
 import math as m
-import numpy as np
 import requests
 from datetime import datetime, timedelta, timezone
 import json
@@ -459,7 +458,7 @@ class Ground(LightSequence):
         r = rx * random.random()
 
         # determine our direction
-        s = np.random.normal(0, 1, 3)
+        s = random.gauss(0, 1)
         norm = m.sqrt(sum(s*s))
         d = s/norm
 

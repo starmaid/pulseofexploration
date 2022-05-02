@@ -31,3 +31,10 @@ chmod +x ./run.sh
 
 # Set up an autorun at boot. No need to eat output, logs go directly to their files
 (crontab -l ; echo "@reboot sleep 15 && /home/pi/pulseofexploration/run.sh &") | uniq - | crontab -
+
+# tell user to set timezone
+echo "Configuration complete."
+echo "Your set timezone is:"
+cat /etc/timezone
+echo "If this is not accurate, enter 'sudo raspi-config' and set your local timezone under localization settings."
+

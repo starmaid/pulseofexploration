@@ -20,8 +20,6 @@ Check out the README files in each theme folder!
 
 make a setup script for the user
 
-- add timezone setting screen
-
 build the dang thing with frame
 
 continue writing instructions
