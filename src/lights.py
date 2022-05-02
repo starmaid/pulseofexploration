@@ -471,9 +471,9 @@ class Ground(LightSequence):
         # ints capped between 0-255
         for i in range(0,len(newpx)):
             newpx[i] = int(newpx[i])
-            if i < 0:
+            if newpx[i] < 0:
                 newpx[i] = 0
-            elif i > 255:
+            elif newpx[i] > 255:
                 newpx[i] = 255
         
         return tuple(newpx)
