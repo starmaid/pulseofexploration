@@ -55,6 +55,11 @@ class LightSequence:
         """This is the map() function from Arduino. 
         Im using it to sample from the image rows."""
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+        
+        if y < outMin:
+            y = outMin
+        if y > outMax:
+            y = outMax
         return int(y)
 
     def logmap(self, x, inMin, inMax, outMin, outMax):
@@ -69,6 +74,11 @@ class LightSequence:
         inMax = m.log10(inMax)
 
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+        
+        if y < outMin:
+            y = outMin
+        if y > outMax:
+            y = outMax
         return int(y)
 
     def playImg(self):
