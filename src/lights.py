@@ -458,12 +458,12 @@ class Ground(LightSequence):
         r = rx * random.random()
 
         # determine our direction
-        s = random.gauss(0, 1)
-        norm = m.sqrt(sum(s*s))
-        d = s/norm
+        s = [random.gauss(0, 1),random.gauss(0, 1),random.gauss(0, 1)]
+        norm = m.sqrt(sum([i*i for i in s]))
+        d = [i/norm for i in s]
 
         # multiply
-        vec = r * d
+        vec = [r * i for i in d]
 
         # add noise change
         newpx = list(px) + vec
