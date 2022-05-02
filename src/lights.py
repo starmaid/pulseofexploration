@@ -466,7 +466,7 @@ class Ground(LightSequence):
         vec = [r * i for i in d]
 
         # add noise change
-        newpx = list(px) + vec
+        newpx = [list(px)[i] + vec[i] for i in range(0,len(px))]
 
         # ints capped between 0-255
         for i in range(0,len(newpx)):
@@ -543,7 +543,7 @@ class Ground(LightSequence):
         else:
             # night again
             newpx = self.night
-        
+
         # apply noise to the pixel to vary it
         newpx = self.noisepx(newpx,20)
 
