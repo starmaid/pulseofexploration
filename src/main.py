@@ -54,6 +54,8 @@ class Pulse:
             self.groundfirst = self.config['groundFirst']
             self.framerate = self.config['framerate']
             self.themeName = self.config['theme']
+            self.lat = self.config['latitude']
+            self.lng = self.config['longitude']
         except Exception as e:
             logging.error('Value not found in config file: ' + str(e))
             logging.error('Stopping Program')
@@ -189,7 +191,7 @@ class Pulse:
         """
 
         # set the startup running sequences
-        self.activeSequences = [lights.Ground(self.lights,self.ground), 
+        self.activeSequences = [lights.Ground(self.lights,self.ground,self.lat,self.lng), 
                             lights.Idle(self.lights,self.signal), 
                             lights.IdleSky(self.lights,self.sky)]
 

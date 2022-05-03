@@ -9,5 +9,7 @@
     "RGBW": false,
     "groundFirst": true,
     "framerate": 10,
-    "theme": "Default"
+    "theme": "Default",
+    "latitude": 37.77,
+    "longitude": -122.41
 }

@@ -80,6 +80,43 @@ class LightSequence:
         if y > outMax:
             y = outMax
         return int(y)
+    
+    def noisepx(self, px, rx):
+        """apply addative RGB color noise 
+        to a single pixel up to radius rx"""
+        
+        # determine our radius
+        r = rx * random.random()
+
+        # determine our direction
+        s = [random.gauss(0, 1),random.gauss(0, 1),random.gauss(0, 1)]
+        norm = m.sqrt(sum([i*i for i in s]))
+        d = [i/norm for i in s]
+
+        # multiply
+        vec = [r * i for i in d]
+
+        # add noise change
+        newpx = [list(px)[i] + vec[i] for i in range(0,len(px))]
+
+        # ints capped between 0-255
+        for i in range(0,len(newpx)):
+            newpx[i] = int(newpx[i])
+            if newpx[i] < 0:
+                newpx[i] = 0
+            elif newpx[i] > 255:
+                newpx[i] = 255
+        
+        return tuple(newpx)
+    
+    def mixpx(self,px1,px2,percent):
+        """linear pixel mix between two colors
+        starts at px1 and goes to px2 at 100 percent
+        also percent should be between 0 and 1"""
+        mix1 = [int((1-percent)*i) for i in px1]
+        mix2 = [int(percent*i) for i in px2]
+        mixresult = tuple([mix1[i]+mix2[i] for i in range(0,len(mix1))])
+        return mixresult
 
     def playImg(self):
         """Play an image row by row on the lights."""
@@ -164,18 +201,6 @@ class Transmission(LightSequence):
 
 
         if self.dir in ['down', 'both']:
-            # power
-            # down values are in dBm, keyerror if none
-            # change brightness of lights
-            # 2.426920219828798e-22
-            # 3.9451198380957787e-22
-            # 7.882799856329301e-19
-            # 1.1014518076312253e-17
-            # 1.5212020429833592e-18
-            # 1.0274246946691201e-17
-            # 1.263283139977561e-18
-            # 4.851862671789916e-18
-            # 1.5398481656110987e-18
             print('power (dBm): ' + str(self.ship['down_power']))
             if self.ship['down_power'] == 0:
                 self.power = 1
@@ -187,47 +212,17 @@ class Transmission(LightSequence):
                 if self.power < 1:
                     self.power = 1
             
-            # frequency
-            # down is in MHz, keyerror if none
-            # change spacing of lights
-            # 8.420392184740615
-            # 8.445743892618303
-            # 2.270410574663693
-            # 2.281895275773722
-            # 8.439690878445852
-            # 2.2450060852689053
-            # 2.2783730883865863
-            # 8.446086418383214
-            # 8.439636400350302
             if 'down_frequency' in self.ship.keys() and self.ship['down_frequency'] is not None:
                 self.frequency = self.ship['down_frequency'] / 1000000000
             else:
                 self.frequency = 8
 
         elif self.dir == 'up':
-            # power
-            # up in kW, keyerror if 
-            # 4.9
-            # 0.26
-            # 1.8
-            # 9.94
-            # 0.21
-            # 10.24
             if self.ship['up_power'] == 0:
                 self.power = 0.2 * 1000
             else:
                 self.power = self.ship['up_power'] * 1000
-
-            # frequency
-            # up is in Hz, keyerror if none
-            # 7188.0
-            # 7182.0
-            # 7156.0
-            # 2067.0
-            # 2090.0
-            # 7187.0
-            # 2091.0
-            # 2039.0
+            
             if 'up_frequency' in self.ship.keys() and self.ship['up_frequency'] is not None:
                 self.frequency = self.ship['up_frequency'] / 1000
             else: 
@@ -239,7 +234,6 @@ class Transmission(LightSequence):
         print(self.ship['name'])
         print(self.power)
         print(self.frequency)
-
 
         # send 10 beams or something idk
         # this could be datarate
@@ -278,27 +272,6 @@ class Transmission(LightSequence):
         
         if self.dir != 'up':
             d = d * -1
-        
-        # in a groundfirst up, the indexes increase d = -1
-        # position of first light = lRange[0] + prog
-        # position of secon light = lRange[0] + prog - 1
-        # position of third light = lRange[0] + prog - 2
-
-        # groundfirst down d = 1
-        # position of first light = lRange[1] - prog
-        # position of secon light = lRange[1] - prog + 1
-        # position of third light = lRange[1] - prog + 2
-
-        # skyfirst down d = -1
-        # position of first light = lRange[0] + prog
-        # position of secon light = lRange[0] + prog - 1
-        # position of third light = lRange[0] + prog - 2
-
-        # skyfirst up d = 1
-        # position of first light = lRange[1] - prog
-        # position of secon light = lRange[1] - prog + 1
-        # position of third light = lRange[1] - prog + 2
-
         
         apos = {}
         for i in range(0,len(self.lset)):
@@ -383,7 +356,7 @@ class DeepSpace(LightSequence):
 class Ground(LightSequence):
     """The ground. can add functionality, but for now is green and blue"""
 
-    def __init__(self, lights, lRange):
+    def __init__(self, lights, lRange, lat, lng):
         super().__init__(lights, lRange)
         self.green = (0,255,0)
         self.blue  = (30,130,190)
@@ -391,6 +364,9 @@ class Ground(LightSequence):
         self.orange= (245,140,0)
         self.night = (5,0,20)
         self.white = (255,255,255)
+
+        self.lat = lat
+        self.lng = lng
 
         self.sunrise = None
         self.sunset  = None
@@ -407,47 +383,20 @@ class Ground(LightSequence):
             self.q = queue.Queue(l)
         else:
             self.q = None
-        
         return
-
-
     
     def updateDay(self,offset=0):
-        # make request
+        """Pull down new sunrise and sunset times"""
 
         # use LOCAL day to ask the api
         endpoint = 'https://api.sunrise-sunset.org/json'
         data = {
-            'lat':37.77,
-            'lng':-122.41,
+            'lat': self.lat,
+            'lng': self.lng,
             'date':datetime.now().strftime("%Y-%m-%d"),
             'formatted':0
         }
 
-        #'lat':37.77,
-        #'lng':-122.41,
-        #'date':datetime.now().strftime("%Y-%m-%d"),
-
-        """
-        NOTE: All times are in UTC and summer time adjustments are not included in the returned data.
-        {
-            "results":
-            {
-                "sunrise":"2015-05-21T05:05:35+00:00",
-                "sunset":"2015-05-21T19:22:59+00:00",
-                "solar_noon":"2015-05-21T12:14:17+00:00",
-                "day_length":51444,
-                "civil_twilight_begin":"2015-05-21T04:36:17+00:00",
-                "civil_twilight_end":"2015-05-21T19:52:17+00:00",
-                "nautical_twilight_begin":"2015-05-21T04:00:13+00:00",
-                "nautical_twilight_end":"2015-05-21T20:28:21+00:00",
-                "astronomical_twilight_begin":"2015-05-21T03:20:49+00:00",
-                "astronomical_twilight_end":"2015-05-21T21:07:45+00:00"
-            },
-            "status":"OK"
-        }
-        """
-        
         r = requests.get(endpoint,params=data)
         sundata = json.loads(r.content.decode('UTF-8'))
 
@@ -458,44 +407,6 @@ class Ground(LightSequence):
         # get the things
         self.sunrise = datetime.fromisoformat(sundata['results']['civil_twilight_begin'])
         self.sunset  = datetime.fromisoformat(sundata['results']['civil_twilight_end'])
-
-
-    def noisepx(self, px, rx):
-        # apply color noise to a pixel
-        # up to radius rx
-        
-        # determine our radius
-        r = rx * random.random()
-
-        # determine our direction
-        s = [random.gauss(0, 1),random.gauss(0, 1),random.gauss(0, 1)]
-        norm = m.sqrt(sum([i*i for i in s]))
-        d = [i/norm for i in s]
-
-        # multiply
-        vec = [r * i for i in d]
-
-        # add noise change
-        newpx = [list(px)[i] + vec[i] for i in range(0,len(px))]
-
-        # ints capped between 0-255
-        for i in range(0,len(newpx)):
-            newpx[i] = int(newpx[i])
-            if newpx[i] < 0:
-                newpx[i] = 0
-            elif newpx[i] > 255:
-                newpx[i] = 255
-        
-        return tuple(newpx)
-    
-    def mixpx(self,px1,px2,percent):
-        # linear pixel mix between two colors
-        # starts at px1 and goes to px2 at 100 percent
-        # also percent should be between 0 and 1
-        mix1 = [int((1-percent)*i) for i in px1]
-        mix2 = [int(percent*i) for i in px2]
-        mixresult = tuple([mix1[i]+mix2[i] for i in range(0,len(mix1))])
-        return mixresult
     
     def run(self):
         # check if we even have a ground to update
@@ -577,7 +488,6 @@ class Ground(LightSequence):
             self.q.put(i)
 
         self.progress += 1
-
         return True
 
 class Img(LightSequence):
