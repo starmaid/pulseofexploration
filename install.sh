@@ -33,8 +33,9 @@ chmod +x ./run.sh
 (crontab -l ; echo "@reboot sleep 15 && /home/pi/pulseofexploration/run.sh &") | uniq - | crontab -
 
 # tell user to set timezone
-echo "Configuration complete."
+echo "\n\nConfiguration complete."
 echo "Your set timezone is:"
 cat /etc/timezone
 echo "If this is not accurate, enter 'sudo raspi-config' and set your local timezone under localization settings."
 
+echo "\nAlso remember to edit ./data/config.json to finish setting up your lights! \n"

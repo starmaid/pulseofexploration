@@ -429,13 +429,15 @@ class Ground(LightSequence):
             # we need to get new ones
             self.updateDay()
         
-        if self.sunrise - self.now > self.radius:
+        if self.sunrise - self.now > timedelta(seconds=0):
+            #if self.sunrise - self.now > self.sunrise:
             # night
             newpx = self.night
         elif self.sunrise - self.now > -self.radius:
             # sunrise - fade through blue
             # find what percentage along the transition we are
-            percent = (self.now - (self.sunrise - self.radius)) / (self.radius*2)
+            # percent = (self.now - (self.sunrise - self.radius)) / (self.radius)
+            percent = (self.now - self.sunrise) / (self.radius)
             mix1result = self.mixpx(self.night, self.blue, percent)
 
             # pull the color in the direction of teal
@@ -451,9 +453,11 @@ class Ground(LightSequence):
             else:
                 newpx = self.white
 
-        elif self.sunset - self.now > -self.radius:
+        elif self.sunset - self.now > timedelta(seconds=0):
+            #elif self.sunset - self.now > - self.radius:
             # sunset - fade through orange
-            percent = (self.now - (self.sunset - self.radius)) / (self.radius*2)
+            #percent = (self.now - (self.sunset - self.radius)) / (self.radius*2)
+            percent = (self.now - self.sunset) / (self.radius)
             mix1result = self.mixpx(self.blue, self.night, percent)
 
             # pull the color in the direction of orange
