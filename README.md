@@ -138,6 +138,13 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
     Wait for the Green STATUS LED to blink 10 times and then you can disconnect the pwoer cable.
 
+The next time you power on the RPi, it should run the lights sequence! You can test it before integrating with your system.
+
+### Hardware Assembly
+
+This is a series of steps that are a little complex to save the effort of learning to solder. If you have access to a soldering iron and different pin connectors, I recommend making your own wiring harness setup. However, that doesn't apply to most of my friends who will be reading this, so give it a shot.
+
+
 20. Take your knife and pop the pins from the LED strip connector. You just have to press the raised section down, and then push out.
 
     ![](/docs/build1.png)
@@ -156,7 +163,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
     ![](./docs/build8.png)
 
-The next time you power on the RPi, it should run the lights sequence! You can test it before integrating with your system. If you have issues, [submit an issue here on GitHub](https://github.com/starmaid/pulseofexploration/issues), or message/email me.
+If you have issues, [submit an issue here on GitHub](https://github.com/starmaid/pulseofexploration/issues), or message/email me.
 
 ## My Build
 
