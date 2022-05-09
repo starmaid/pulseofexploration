@@ -158,7 +158,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 The next time you power on the RPi, it should run the lights sequence! You can test it before integrating with your system. If you have issues, [submit an issue here on GitHub](https://github.com/starmaid/pulseofexploration/issues), or message/email me.
 
-### My Build
+## My Build
 
 My own build was made out of Dollar Tree Redi-Board and hot glue, a good cheap building and drafting technique.
 
@@ -169,6 +169,23 @@ My own build was made out of Dollar Tree Redi-Board and hot glue, a good cheap b
 For this build, I used wiring diagram 1, with exactly 30 lights. I'm pushing my recommendations, but that's my responsibility if I burn out my pi.
 
 ![](./docs/build7.png)
+
+## Config File
+
+This is the file you modify to configure your lights.
+
+
+| Variable | Effect    |
+|----------|-----------|
+| lights   | the number of LEDs in each segment.
+| pin      | Which DIO pin the lights are connected to. Must be a PWM pin. |
+| brightness | Max brightness percentage for the lights. Scales all colors. |
+| RGBW     | Set `true` if you have RGBW instead of just RGB lights.
+| groundFirst | set `true` if the ground segment is closer to the RPi (as opposed to the sky) |
+| framerate | framerate for updating the sky LEDs |
+| theme | Set to the name of the folder your theme resides in inside `./data` |
+| latitude | Latitude of your location to use in daylight calculation. |
+| longitude | Longitude of your location to use in daylight calculation. |
 
 ## Power Consumption Details
 
