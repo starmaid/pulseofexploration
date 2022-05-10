@@ -1,25 +1,29 @@
+# dsn.py
+# written by Starmaid in early 2022
+
+# Builtin Libraries
 import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime
 import logging
 
+# Disable logging on these libs that left debug ON FUCK
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger('charset_normalizer').setLevel(logging.WARNING)
 
 class DSNQuery:
     """Handles data queries from NASA DSN"""
-
     def __init__(self):
         self.activeSignals = {}
         self.getFriendlyNames()
-
 
     def getFriendlyNames(self):
         # get friendly names
         friendlyxml = requests.get('https://eyes.nasa.gov/dsn/config.xml')
         parser = ET.XMLParser(encoding='UTF-8')
         friendlynames = ET.fromstring(friendlyxml.text, parser=parser)
+        
         # make dict of friendlynames
         allships = friendlynames.findall("./spacecraftMap/spacecraft")
         self.friendlyTranslator = {}
@@ -29,13 +33,13 @@ class DSNQuery:
 
     
     def poll(self):
-        # get whos talking
+        """Ask DSN Now whats up and return the data"""
         dishxml = requests.get('https://eyes.nasa.gov/dsn/data/dsn.xml')
     
-        # this gives us the actual xml object to work with
+        # Get the actual xml object to work with
         comms = ET.fromstring(dishxml.text)
 
-        # go through each dish
+        # Go through each dish
         # find all down and upsignals
         # add each found spaceship and power/frequency to a list
         # translate shortnames to friendlynames
@@ -43,16 +47,18 @@ class DSNQuery:
 
         for dish in comms.findall('./dish'):
             for target in dish.findall('./target'):
+                # These are the spacecraft
                 sDict = {}
                 name = target.attrib['name'].lower()
                 if name == "":
                     continue
-
+                
                 sDict['name'] = name
                 try:
                     sDict['friendlyName'] = self.friendlyTranslator[name]
                 except:
-                    #print("key " + name + " not found")
+                    # No clue why this would happen but eh lets be safe
+                    #logging.debug("key " + name + " not found")
                     continue
 
                 for signal in dish.findall('./upSignal'):
@@ -113,7 +119,8 @@ class DSNQuery:
                 sDict['dish'] = dish.attrib['name']
                 signals[name] = sDict
         
-        # remove things we dont care about
+        # Remove things we dont care about
+        # Mind control voice: KILL TESTING
         for i in ["dsn", "dss", "test", "testing", "Testing"]:
             try:
                 signals.pop(i)
@@ -127,6 +134,8 @@ class DSNQuery:
         return signals
 
     def getNew(self):
+        """Look at the data returned from DSN and
+        determine which signals are new"""
         signals = self.poll()
         
         newsignals = {}
@@ -141,8 +150,6 @@ class DSNQuery:
                     newsignals[s] = signals[s]
                     self.activeSignals[s] = signals[s]
         
-
-
         # Remove signal if it is no longer active
         removenames = []
         for s in self.activeSignals.keys():
@@ -153,7 +160,6 @@ class DSNQuery:
             self.activeSignals.pop(name)
 
         if len(newsignals) > 0:
-            print('\n' + str(newsignals))
+            logging.debug('\n' + str(newsignals))
         
         return newsignals
-

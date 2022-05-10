@@ -8,12 +8,12 @@ import platform
 import logging
 from datetime import datetime
 
+# Initialize logger - TODO: make a cmdline param?
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
-
-# Determine if we should enter debug mode
+# Determine if we should enter live or debug mode
 if 'arm' in platform.machine():
-    # then we are running on a board that can do lights. probably
+    # Then we are running on a board that can do lights. probably
     live = True
     import board
     import neopixel
@@ -22,21 +22,20 @@ if 'arm' in platform.machine():
     print('Starting lights in live mode')
     logging.warning('Starting lights in live mode')
 else:
+    # Then we are probably not running on a RPi.
     live = False
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
     print('Starting lights in test mode')
-
 
 # Custom modules
 import dsn
 import lights
 
-
 class Pulse:
     def __init__(self):
         """Sets up the config, lights array, and the async queue"""
 
-        # Load the config file with ship/planet associations
+        # Try to load the config file
         try:
             with open("./data/config.json","r") as f:
                 self.config = json.load(f)
@@ -68,6 +67,7 @@ class Pulse:
 
         self.brightness = self.brightness / 100
 
+        # Try to open themes
         try:
             with open("./data/" + str(self.themeName) + "/theme.json","r") as f2:
                 self.theme = json.load(f2)
@@ -78,6 +78,7 @@ class Pulse:
 
         numLeds = [self.lightsegments[a] for a in ['ground', 'signal', 'sky']]
         
+        # Set up LED control, if we are live
         global live
         if live:
             if self.rgbw:
@@ -86,7 +87,7 @@ class Pulse:
                 order = neopixel.GRB
             try:
                 if self.pin not in [18,19,20,21]:
-                    raise Exception('pin does not support PCM')
+                    raise Exception('Selected pin does not support PCM. See pinout and modify config.')
 
                 pinname = getattr(board,'D'+str(self.pin))
                 self.lights = neopixel.NeoPixel(pinname, sum(numLeds), 
@@ -97,9 +98,10 @@ class Pulse:
                 logging.error('Stopping Program')
                 raise e
         else:
+            # If we arent live, lets just use an array of tuples.
             self.lights = [(0,0,0)] * sum(numLeds)
 
-        # tuple ranges for each section so we can pass them to sequences
+        # Tuple ranges for each section so we can pass them to sequences
         if self.groundfirst:
             self.ground = (0, numLeds[0])
             self.signal = (numLeds[0], numLeds[0]+numLeds[1])
@@ -112,17 +114,14 @@ class Pulse:
         # list of currently active sequences
         self.activeSequences = [None, None, None]
 
+        # Turn framerate into a number of seconds
         self.framedelay = 1 / int(self.framerate)
 
         # Create an empty queue for our instructions to be stored in
         self.queue = asyncio.Queue(maxsize=50)
 
-        #self.queue.put_nowait()
-
-
     async def start(self):
         """start both threads, and wait for them to finish before ending."""
-        # self.runDsn(self.queue),
         try: 
             await asyncio.gather(
                 self.runDsn(self.queue),
@@ -130,8 +129,11 @@ class Pulse:
                 self.runLights(self.queue)
                 )
         except KeyboardInterrupt:
+            # This is not an effective keyboard interrupt.
+            # TODO: Figure out a way to eat keyboard input while running.
             self.lights = [(0,0,0) for i in range(0,len(self.lights))]
-            self.lights.show()
+            #self.lights.show()
+            pass
         return
 
     async def runDsn(self, queue):
@@ -140,15 +142,15 @@ class Pulse:
         reads when the dsn sends a stop item, sends it to lights, and ends."""
 
         q = dsn.DSNQuery()
-        
         running = True
 
         while running:
             try:
+                # Poll DSN
                 newsignals = q.getNew().keys()
 
+                # Check if theres anything new
                 if len(newsignals) > 0:
-                    # put the new objects in
                     for s in newsignals:
                         newSequence = None
                         if s in self.theme['ships'].keys():
@@ -178,6 +180,7 @@ class Pulse:
                 
             except KeyboardInterrupt:
                 # Add the stop object
+                # TODO: this doesnt really work either
                 running = False
                 self.queue.put(lights.Stop())
         return
@@ -190,7 +193,7 @@ class Pulse:
         reads a stop item in the queue and ends
         """
 
-        # set the startup running sequences
+        # Set the startup running sequences
         self.activeSequences = [lights.Ground(self.lights,self.ground,self.lat,self.lng), 
                             lights.Idle(self.lights,self.signal), 
                             lights.IdleSky(self.lights,self.sky)]
@@ -198,8 +201,8 @@ class Pulse:
         running = True
 
         while running:
-            # reads the commands in the queue
-            # if the queue is currently empty, it will wait for the next item to be added.
+            # Reads the commands in the queue
+            # If the queue is currently empty, it will wait for the next item to be added.
             obj = await queue.get()
             if obj is not None:
                 if obj.stop:
@@ -247,7 +250,7 @@ class Pulse:
             if live:
                 self.lights.show()
             else:
-                # turn the lights into a 0-9 scale of brightness
+                # Turn the lights into a 0-9 scale of brightness
                 allL = [int(sum(self.lights[a])/3/25.6) for a in range(0,len(self.lights))]
                 allLString = ''
                 for l in allL:
@@ -255,6 +258,7 @@ class Pulse:
 
                 print(allLString + '\r',end='')
             
+            # Wait frame time to refresh lights
             await asyncio.sleep(self.framedelay)
         return
     
@@ -262,7 +266,6 @@ class Pulse:
     
 # This is the section of the program that runs when executed
 if __name__ == "__main__":
-    # create the parser
     p = Pulse()
 
     # start the job.
@@ -272,5 +275,5 @@ if __name__ == "__main__":
         # python 3.7
         asyncio.get_event_loop().run_until_complete(p.start())
     else:
-        # But on windows with python 3.10 gives depreciation warning
+        # But on windows with python 3.10 gives depreciation warning and wants this
         asyncio.run(p.start())

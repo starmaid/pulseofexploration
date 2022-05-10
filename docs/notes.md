@@ -26,6 +26,19 @@ NOTE: All times are in UTC ansummer time adjustments are noincluded in the retur
 
 ## Data Collection on signals
 
+```
+with open('./dataout.csv', 'a') as f:
+    line = ''
+    for field in ['name', 'rtlt', 'up', 'up_power', 'up_dataRate', 'up_frequency', 'down', 'down_power', 'down_dataRate', 'down_frequency']:
+        try:
+            line += str(self.ship[field])
+        except:
+            line += 'None'
+        line += ', '
+    line += '\n'
+    f.writelines(line)
+```
+
 ### Down
 
 ```

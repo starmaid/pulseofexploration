@@ -136,7 +136,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
     sudo poweroff
     ```
 
-    Wait for the Green STATUS LED to blink 10 times and then you can disconnect the pwoer cable.
+    Wait for the Green STATUS LED to blink 10 times and then you can disconnect the power cable.
 
 The next time you power on the RPi, it should run the lights sequence! You can test it before integrating with your system.
 

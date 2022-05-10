@@ -1,4 +1,7 @@
-# This file controls the low level light stuff
+# lights.py
+# Written by Starmaid in early 2022
+
+# Builtin Libraries
 import asyncio
 import random
 import logging
@@ -8,17 +11,13 @@ from datetime import datetime, timedelta, timezone
 import json
 import queue
 
+# External
 from PIL import Image
-
 logging.getLogger("PIL").setLevel(logging.WARNING)
 
-#import board
-#import neopixel
-
-# Setup Lines
+# Setup 
 random.seed()
 IMAGESPATH = "./data/"
-
 
 class LightSequence:
     """controls what colors are sent to the array of pixels"""
@@ -179,17 +178,6 @@ class Transmission(LightSequence):
             self.dir = None
 
         print(self.dir)
-
-        #with open('./dataout.csv', 'a') as f:
-        #    line = ''
-        #    for field in ['name', 'rtlt', 'up', 'up_power', 'up_dataRate', 'up_frequency', 'down', 'down_power', 'down_dataRate', 'down_frequency']:
-        #        try:
-        #            line += str(self.ship[field])
-        #        except:
-        #            line += 'None'
-        #        line += ', '
-        #    line += '\n'
-        #    f.writelines(line)
 
         # round trip light time (s)
         # from 0 to 200000 (leo to voyager) with -1.0 as None
