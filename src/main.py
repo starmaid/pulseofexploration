@@ -8,7 +8,7 @@ import platform
 import logging
 from datetime import datetime
 
-# Initialize logger - TODO: make a cmdline param?
+# Set library logging levels
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 # Determine if we should enter live or debug mode

@@ -7,7 +7,7 @@ import requests
 from datetime import datetime
 import logging
 
-# Disable logging on these libs that left debug ON FUCK
+# Set library logging levels
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger('charset_normalizer').setLevel(logging.WARNING)

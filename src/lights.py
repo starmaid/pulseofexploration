@@ -3,6 +3,7 @@
 
 # Builtin Libraries
 import asyncio
+from platform import libc_ver
 import random
 import logging
 import math as m
@@ -13,6 +14,8 @@ import queue
 
 # External
 from PIL import Image
+
+# Set library logging levels
 logging.getLogger("PIL").setLevel(logging.WARNING)
 
 # Setup 
@@ -46,7 +49,6 @@ class LightSequence:
         if not isvalid:
             return False
         rpix = list(image.getdata())[(width*row):(width*(row+1))]
-        #print([x[0] for x in rpix])
         rout = [rpix[self.linmap(n,0,numPixels,0,width)][0:3] for n in range(0,numPixels)]
         return rout
 
@@ -67,7 +69,7 @@ class LightSequence:
         try:
             x = m.log10(x)
         except:
-            print('math exception ' + str(x))
+            logging.warning('math exception ' + str(x))
             x = 1
         inMin = m.log10(inMin)
         inMax = m.log10(inMax)
@@ -123,7 +125,6 @@ class LightSequence:
         if not rout:
             return False
         else:
-            #print([x[0] for x in rout])
             self.lights[self.lRange[0]:self.lRange[1]] = rout
             self.progress += 1
         return True
@@ -177,8 +178,6 @@ class Transmission(LightSequence):
             # i hope we never get here
             self.dir = None
 
-        print(self.dir)
-
         # round trip light time (s)
         # from 0 to 200000 (leo to voyager) with -1.0 as None
         # probably do some log scaling
@@ -189,28 +188,30 @@ class Transmission(LightSequence):
 
 
         if self.dir in ['down', 'both']:
-            print('power (dBm): ' + str(self.ship['down_power']))
+            # Power reported in dBm
             if self.ship['down_power'] == 0:
                 self.power = 1
             else:
                 self.power = 10 ** ((self.ship['down_power'] - 30) / 10) / 1000
-                # now its gunna be super small soooo
-                print('power (KW): ' + str(self.power))
+                # Now its gunna be super small so...
                 self.power = self.power * 1e22
                 if self.power < 1:
                     self.power = 1
             
+            # Frequency in MHz
             if 'down_frequency' in self.ship.keys() and self.ship['down_frequency'] is not None:
                 self.frequency = self.ship['down_frequency'] / 1000000000
             else:
                 self.frequency = 8
 
         elif self.dir == 'up':
+            # Power in kW
             if self.ship['up_power'] == 0:
                 self.power = 0.2 * 1000
             else:
                 self.power = self.ship['up_power'] * 1000
             
+            # Frequency in GHz
             if 'up_frequency' in self.ship.keys() and self.ship['up_frequency'] is not None:
                 self.frequency = self.ship['up_frequency'] / 1000
             else: 
@@ -218,17 +219,17 @@ class Transmission(LightSequence):
         else:
             self.power = 1000
             self.frequency = 5
-            
-        print(self.ship['name'])
-        print(self.power)
-        print(self.frequency)
 
-        # send 10 beams or something idk
-        # this could be datarate
-        # power 
+        # Debug a signal
+        logging.debug('Dir: ' + str(self.dir))
+        logging.debug('Name: ' + str(self.ship['name']))
+        logging.debug('Power: ' + str(self.power))
+        logging.debug('Freqz: ' + str(self.frequency))
+
+        # Turn the values into lights
+        off = (0,0,0)
         intensity = self.logmap(self.power,1,100000,20,255)
         color = (intensity, intensity, intensity)
-        off = (0,0,0)
         self.delay = self.logmap(self.rtlt,1,200000,1,10)
         spacing = 11 - self.logmap(self.frequency,1,10,1,10)
 
@@ -239,7 +240,7 @@ class Transmission(LightSequence):
                 for i in range(0,spacing):
                     lset.append(off)
         
-        print(lset)
+        logging.info(lset)
         self.lset = lset
         self.progress = 0
 
