@@ -44,6 +44,8 @@ class LightSequence:
         return True
     
     def getRow(self, image, row, numPixels):
+        """From a loaded image, get a row of pixels.
+        Does the down/up sampling"""
         width,height = image.size
         isvalid = row*width < width*height
         if not isvalid:
@@ -54,7 +56,9 @@ class LightSequence:
 
     def linmap(self, x, inMin, inMax, outMin, outMax):
         """This is the map() function from Arduino. 
-        Im using it to sample from the image rows."""
+        Im using it to sample from the image rows.
+        This is not great for getting mean pixels. 
+        think about it"""
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
         
         if y < outMin:
@@ -135,6 +139,8 @@ class LightSequence:
 
 
 class Stop():
+    """An empty object that always returns False
+    for the run method."""
     def __init__(self) -> None:
         self.stop = True
         pass
@@ -142,11 +148,10 @@ class Stop():
     def run(self):
         return False
 
-    
 
 class Idle(LightSequence):
     """Sequence that turns the lights off."""
-
+    
     def __init__(self, lights, lRange, ship=None):
         super().__init__(lights, lRange, ship)
 
@@ -155,7 +160,6 @@ class Idle(LightSequence):
         if self.progress == 0:
             self.lights[self.lRange[0]:self.lRange[1]] = [(0,0,0) for i in range(self.lRange[0],self.lRange[1])]
             self.progress = 1
-        
         return True
 
 
@@ -315,6 +319,7 @@ class IdleSky(LightSequence):
 
 class DeepSpace(LightSequence):
     """deep space twinkle"""
+    
     def __init__(self, lights, lRange, ship=None):
         super().__init__(lights, lRange, ship)
     
@@ -484,6 +489,8 @@ class Ground(LightSequence):
         return True
 
 class Img(LightSequence):
+    """Class to play an image line by line."""
+    
     def __init__(self, lights, lRange, theme, filename, ship=None):
         super().__init__(lights, lRange, ship)
         self.stop = not self.openImg(theme + '/' + filename + '.png')

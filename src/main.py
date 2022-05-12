@@ -122,6 +122,7 @@ class Pulse:
 
     async def start(self):
         """start both threads, and wait for them to finish before ending."""
+        
         try: 
             await asyncio.gather(
                 self.runDsn(self.queue),
