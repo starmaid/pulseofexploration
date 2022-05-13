@@ -1,5 +1,7 @@
 # Pulse of Exploration (mini)
 
+![](./docs/pic2.gif)
+
 ![](./docs/pic1.gif)
 
 I love [Dan Goods' art installation at JPL "Pulse of Exploration"](https://vimeo.com/93420747). I am constantly amazed that we are constantly recieving little messages from the robotic explorers around the solar system. Its going on right now! I also believe there was a similar project on the internet somewhere in 2019, but I cannot find it. This is similar to the "is the ISS above right now" light.
@@ -19,6 +21,26 @@ Check out the README files in each theme folder!
 Currently done! If you have issues or improvements, add em to [GitHub Issues](https://github.com/starmaid/pulseofexploration/issues) and I'll take a look.
 
 ## How to Build your Own
+
+![](./docs/supplies.jpg)
+
+### Parts
+
+| Item   | Avg. Cost |
+| ------ |----------|
+| Raspberry Pi Zero |  $10 |
+| 4GB or larger microSD card | $8 |
+| 2A or more power adapter + cable | $5 |
+| WS2812b 5V light strip | $10 |
+
+**NOTE (Spring 2022):** There is currently a global shortage of Raspberry Pi devices. It is more likely you will be able to pick one up from a local computer store for MSRP than online.
+
+### Tools
+
+- MicroSD adapter for your computer
+- Knife
+- Electrical tape
+- (Soldering Iron, possibly)
 
 ### Deciding on a Build
 
@@ -49,24 +71,6 @@ There are three options for wiring the lights.
 | 4 B    | 800     | 20 |
 
 If you are integrating this with another project, remember that the WS2812b lights need a pin that can output a PCM (or PWM, as I learned it) signal. By default the config uses `GPIO 18`, but see the [pinout](https://pinout.xyz/pinout/pcm#) for other options.
-
-### Parts
-
-| Item   | Avg. Cost |
-| ------ |----------|
-| Raspberry Pi Zero |  $10 |
-| 4GB or larger microSD card | $8 |
-| 2A or more power adapter + cable | $5 |
-| WS2812b 5V light strip | $10 |
-
-**NOTE (Spring 2022):** There is currently a global shortage of Raspberry Pi devices. It is more likely you will be able to pick one up from a local computer store for MSRP than online.
-
-### Tools
-
-- MicroSD adapter for your computer
-- Knife
-- Electrical tape
-- (Soldering Iron, possibly)
 
 ### Steps
 
@@ -143,7 +147,6 @@ The next time you power on the RPi, it should run the lights sequence! You can t
 ### Hardware Assembly
 
 This is a series of steps that are a little complex to save the effort of learning to solder. If you have access to a soldering iron and different pin connectors, I recommend making your own wiring harness setup. However, that doesn't apply to most of my friends who will be reading this, so give it a shot.
-
 
 20. Take your knife and pop the pins from the LED strip connector. You just have to press the raised section down, and then push out.
 
