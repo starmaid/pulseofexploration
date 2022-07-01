@@ -92,7 +92,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 9. Remove the MicroSD card from your computer and put it in the Raspberry Pi.
 
-10. Power on the Raspberry Pi by connecting the power cable.
+10. Power on the Raspberry Pi by connecting the power cable. Wait for it to connect to your network.
 
 11. Open a terminal on your computer (PowerShell, Terminal).
 
@@ -112,7 +112,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 14. Login to the `pi` account. The default password is `raspberry`. While you type the password, the characters will not appear.
 
-15. Enter `pwd` and follow the instructions to change the default password.
+15. Enter `passwd` and follow the instructions to change the default password.
 
 16. Install git to download the files from this repository.
 
@@ -126,13 +126,17 @@ If you are integrating this with another project, remember that the WS2812b ligh
     git clone https://github.com/starmaid/pulseofexploration.git
     ```
 
-18. Navigate to, make executable, and run the install script.
+18. Navigate to, make executable, and run the install script. Get a cup of tea, it will take some time.
 
     ```
     cd ./pulseofexploration
     chmod +x ./install.sh
     ./install.sh
     ```
+
+19. Follow the instructions to change the timezone.
+
+blah bl;ah blah
 
 19. Turn off the Raspberry Pi, and then disconnect the power. 
 

@@ -25,6 +25,8 @@ sudo python3 -m pip install --force-reinstall adafruit-blinka
 # Install other dependencies
 sudo pip3 install requests pillow
 
+# Enable GPIO?
+
 # Make run.sh executable
 cd $RUNDIR
 chmod +x ./run.sh
