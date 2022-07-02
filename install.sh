@@ -32,7 +32,7 @@ cd $RUNDIR
 chmod +x ./run.sh
 
 # Set up an autorun at boot. No need to eat output, logs go directly to their files
-(crontab -l ; echo "@reboot sleep 15 && /home/pi/pulseofexploration/run.sh &") | uniq - | crontab -
+(crontab -l ; echo "@reboot sleep 15 && /home/"$USER"/pulseofexploration/run.sh &") | uniq - | crontab -
 
 # tell user to set timezone
 echo "\n\nConfiguration complete."

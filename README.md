@@ -28,12 +28,14 @@ Currently done! If you have issues or improvements, add em to [GitHub Issues](ht
 
 | Item   | Avg. Cost |
 | ------ |----------|
-| Raspberry Pi Zero |  $10 |
+| Raspberry Pi 3b+ |  $30 |
 | 4GB or larger microSD card | $8 |
 | 2A or more power adapter + cable | $5 |
 | WS2812b 5V light strip | $10 |
 
 **NOTE (Spring 2022):** There is currently a global shortage of Raspberry Pi devices. It is more likely you will be able to pick one up from a local computer store for MSRP than online.
+
+**NOTE (Summer 2022):** [The latest release, raspios bullseye, has removed the default user `pi` and its default password.](https://www.raspberrypi.com/news/raspberry-pi-bullseye-update-april-2022/) I have updated the instructions to match, but there may be some issues that I don't catch.
 
 ### Tools
 
@@ -76,33 +78,29 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 1. First, pick a Raspberry Pi. I have some 3B+'s lying around, so that's what I'll be using. Most models will work. If you are purchasing one for this project, I reccomend the Pi Zero W.
 
-2. Download the latest [Raspberry Pi OS Lite](https://www.raspberrypi.com/software/operating-systems/).
-
-3. If you don't already have a software to flash disk images with, download [Etcher](https://www.balena.io/etcher/).
+2. Download the [the Raspberry Pi Imager](https://www.raspberrypi.com/software/) to your computer.
 
 4. If you are using a Windows PC and don't have access or simply dont want to dig into your router's DCHP assignments (or don't know what I just said), download [bonjour services](https://support.apple.com/kb/DL999?locale=en_US).
 
-5. Connect the MicroSD card to your computer. Use Etcher to flash the OS image you just downloaded.
+5. Connect the MicroSD card to your computer. Use the Raspberry Pi Imager to select `Raspberry Pi OS (Other) -> Raspberry Pi OS Lite`
 
-6. Download from this GitHub page [wpa_cupplicant.conf](https://raw.githubusercontent.com/starmaid/pulseofexploration/master/setup/wpa_supplicant.conf) and [ssh](https://raw.githubusercontent.com/starmaid/pulseofexploration/master/setup/ssh). Right click and use 'save page as' to download them. `ssh` is an empty file.
+6. Click the Gear icon to set up the hostname, username, password, wireless LAN, and locale settings.
 
-7. Using a text editor (like notepad), edit the `wpa_supplicant.conf` file to include the credentials for your wifi network.
+7. Flash the SD card image.
 
-8. Copy both the `wpa_supplicant.conf` and `ssh` files into the `X:/boot` drive that appears after flashing the SD card.
+8. Remove the MicroSD card from your computer and put it in the Raspberry Pi.
 
-9. Remove the MicroSD card from your computer and put it in the Raspberry Pi.
+9. Power on the Raspberry Pi by connecting the power cable. Wait for it to connect to your network (may take up to a minute or two).
 
-10. Power on the Raspberry Pi by connecting the power cable. Wait for it to connect to your network.
+10. Open a terminal on your computer (PowerShell, Terminal).
 
-11. Open a terminal on your computer (PowerShell, Terminal).
-
-12. Connect to the Raspberry Pi via SSH. In the terminal, enter 
+11. Connect to the Raspberry Pi via SSH. In the terminal, enter your credentials (replacing `$USER` and `$HOSTNAME` with the username and hostname you set in the earlier step)
 
     ```
-    ssh pi@raspberrypi.local
+    ssh $USER@$HOSTNAME.local
     ```
 
-13. Enter `yes` to the message that may appear:
+12. Enter `yes` to the message that may appear:
 
     ```
     The authenticity of host 'raspberrypi.local (fe80::5865:c6fa:3262:1820%3)' can't be established.
@@ -110,23 +108,15 @@ If you are integrating this with another project, remember that the WS2812b ligh
     Are you sure you want to continue connecting (yes/no/[fingerprint])? 
     ```
 
-14. Login to the `pi` account. The default password is `raspberry`. While you type the password, the characters will not appear.
+13. Login to your user account with the password you set. While you type the password, the characters will not appear.
 
-15. Enter `passwd` and follow the instructions to change the default password.
-
-16. Install git to download the files from this repository.
-
-    ```
-    sudo apt install git
-    ```
-
-17. Download the files from this repository.
+14. Download the files from this repository.
 
     ```
     git clone https://github.com/starmaid/pulseofexploration.git
     ```
 
-18. Navigate to, make executable, and run the install script. Get a cup of tea, it will take some time.
+15. Navigate to, make executable, and run the install script. Get a cup of tea, it will take some time.
 
     ```
     cd ./pulseofexploration
@@ -134,11 +124,7 @@ If you are integrating this with another project, remember that the WS2812b ligh
     ./install.sh
     ```
 
-19. Follow the instructions to change the timezone.
-
-blah bl;ah blah
-
-19. Turn off the Raspberry Pi, and then disconnect the power. 
+16. Turn off the Raspberry Pi, and then disconnect the power. 
 
     ```
     sudo poweroff
@@ -152,7 +138,7 @@ The next time you power on the RPi, it should run the lights sequence! You can t
 
 This is a series of steps that are a little complex to save the effort of learning to solder. If you have access to a soldering iron and different pin connectors, I recommend making your own wiring harness setup. However, that doesn't apply to most of my friends who will be reading this, so give it a shot.
 
-20. Take your knife and pop the pins from the LED strip connector. You just have to press the raised section down, and then push out.
+1. Take your knife and pop the pins from the LED strip connector. You just have to press the raised section down, and then push out.
 
     ![](/docs/build1.png)
 
@@ -160,17 +146,21 @@ This is a series of steps that are a little complex to save the effort of learni
 
     ![](./docs/build2.png)
 
-21. Wrap the end of the pin with electrical tape.
+2. Wrap the end of the pin with electrical tape.
 
     ![](./docs/build3.png)
 
     ![](./docs/build4.png)
 
-22. Connect the wires to the Pi. Check the wiring diagram to verify the pins.
+3. Connect the wires to the Pi. Check the wiring diagram to verify the pins.
 
     ![](./docs/build8.png)
 
 If you have issues, [submit an issue here on GitHub](https://github.com/starmaid/pulseofexploration/issues), or message/email me.
+
+This is what a wiring harness could look like, if you have a 0.1" connector kit.
+
+![](/docs/build10.jpg)
 
 ## My Build
 
