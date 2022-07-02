@@ -110,6 +110,12 @@ If you are integrating this with another project, remember that the WS2812b ligh
 
 13. Login to your user account with the password you set. While you type the password, the characters will not appear.
 
+13. Install git.
+
+    ```
+    sudo apt install git
+    ```
+
 14. Download the files from this repository.
 
     ```

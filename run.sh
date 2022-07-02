@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CRONFILE="/home/pi/cron_out.txt"
+CRONFILE="/home/"$USER"/cron_out.txt"
 
 date >> $CRONFILE
 echo "Starting the Pulse" >> $CRONFILE
