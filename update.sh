@@ -8,6 +8,7 @@ echo
 RUNDIR=`pwd`
 DATE=`date +%s`
 CFILED="../config"$DATE".json"
+CFILEDN="./data/config"$DATE".json"
 CFILE="./data/config.json"
 
 # Copy the current config file
@@ -21,12 +22,14 @@ git pull
 cp $CFILE $CFILE".clean"
 
 # Move the old config file back into place
-mv -f $CFILED $CFILE
+cp $CFILED $CFILE
+mv -f $CFILED CFILEDN
 
 # Make sure run is executable
 chmod +x ./run.sh
+chmod +x ./update.sh
 
 echo
-echo "Old config file saved as "$CFILED
+echo "Old config file saved as "$CFILEDN
 echo "If you have issues, look at "$CFILE".clean for new config format"
 echo
