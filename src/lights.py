@@ -391,7 +391,7 @@ class Ground(LightSequence):
             'formatted':0
         }
 
-        r = requests.get(endpoint,params=data)
+        r = requests.get(endpoint,params=data,verify=False)
         sundata = json.loads(r.content.decode('UTF-8'))
 
         # parse as some simple representation
