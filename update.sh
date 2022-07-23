@@ -11,7 +11,7 @@ CFILED="../config"$DATE".json"
 CFILE="./data/config.json"
 
 # Copy the current config file
-cp "./data/config"$DATE".json" $CFILED
+cp $CFILE $CFILED
 
 # Reset and pull changes
 git reset --hard HEAD
