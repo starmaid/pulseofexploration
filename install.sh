@@ -31,6 +31,7 @@ sudo pip3 install requests pillow
 # Make run.sh executable
 cd $RUNDIR
 chmod +x ./run.sh
+chmod +x ./update.sh
 
 # Set up an autorun at boot. No need to eat output, logs go directly to their files
 (crontab -l ; echo "@reboot sleep 20 && /home/"$USER"/pulseofexploration/run.sh &") | uniq - | crontab -
