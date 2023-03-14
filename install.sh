@@ -23,7 +23,7 @@ sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
 
 # Install other dependencies
-sudo apt install libopenjp2-7 -y
+sudo apt install libopenjp2-7 libtiff5 -y
 sudo pip3 install requests pillow
 
 # Enable GPIO?
@@ -42,4 +42,6 @@ echo "Your set timezone is:"
 cat /etc/timezone
 echo "If this is not accurate, enter 'sudo raspi-config' and set your local timezone under localization settings."
 
-echo "\nAlso remember to edit ./data/config.json to finish setting up your lights! \n"
+echo
+echo "Also remember to edit ./data/config.json to finish setting up your lights!"
+echo
