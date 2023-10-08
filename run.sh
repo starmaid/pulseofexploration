@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# TODO: cron doesnt have a $USER env var!!!! this crashes!!!!
-#CRONFILE="/home/"$USER"/cron_out.txt"
-CRONFILE="/home/cron_out.txt"
+# cron does not have a $USER var, but it does have $HOME
+CRONFILE="$HOME/cron_out.txt"
 
 date >> $CRONFILE
 echo "Starting the Pulse" >> $CRONFILE
