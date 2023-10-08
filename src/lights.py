@@ -210,7 +210,7 @@ class Transmission(LightSequence):
 
         elif self.dir == 'up':
             # Power in kW
-            if self.ship['up_power'] == 0:
+            if self.ship['up_power'] is None or self.ship['up_power'] == 0:
                 self.power = 0.2 * 1000
             else:
                 self.power = self.ship['up_power'] * 1000
