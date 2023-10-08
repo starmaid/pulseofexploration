@@ -96,6 +96,8 @@ class LightSequence:
         # determine our direction
         s = [random.gauss(0, 1),random.gauss(0, 1),random.gauss(0, 1)]
         norm = m.sqrt(sum([i*i for i in s]))
+        if norm == 0:
+            norm = 0.001
         d = [i/norm for i in s]
 
         # multiply
