@@ -73,7 +73,7 @@ class LightSequence:
         try:
             x = m.log10(x)
         except:
-            logging.warning('math exception ' + str(x))
+            #logging.warning('math exception ' + str(x))
             x = 1
         inMin = m.log10(inMin)
         inMax = m.log10(inMax)
