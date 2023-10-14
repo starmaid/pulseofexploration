@@ -6,6 +6,7 @@ import asyncio
 import json
 import platform
 import logging
+import traceback
 from datetime import datetime
 
 # Set library logging levels
@@ -122,19 +123,14 @@ class Pulse:
 
     async def start(self):
         """start both threads, and wait for them to finish before ending."""
-        
-        try: 
-            await asyncio.gather(
+
+        await asyncio.gather(
                 self.runDsn(self.queue),
                 self.runSequenceQueue(self.queue),
-                self.runLights(self.queue)
+                self.runLights(self.queue),
+                return_exceptions=False
                 )
-        except KeyboardInterrupt:
-            # This is not an effective keyboard interrupt.
-            # TODO: Figure out a way to eat keyboard input while running.
-            self.lights = [(0,0,0) for i in range(0,len(self.lights))]
-            #self.lights.show()
-            pass
+        
         return
 
     async def runDsn(self, queue):
@@ -177,7 +173,7 @@ class Pulse:
 
                         await self.queue.put(newSequence)
 
-                await asyncio.sleep(5)
+                await asyncio.sleep(30)
                 
             except KeyboardInterrupt:
                 # Add the stop object
@@ -231,9 +227,8 @@ class Pulse:
         running = True
 
         while running:
-            if self.activeSequences[0].stop:
+            if True in [s.stop for s in self.activeSequences]:
                 running = False
-                break
             
             # The ground should never end LOL
             self.activeSequences[0].run()
@@ -269,6 +264,8 @@ class Pulse:
 if __name__ == "__main__":
     p = Pulse()
 
+    exitWithError = False
+
     # start the job.
     # this is a blocking call and will not move forward until finished
     try:
@@ -279,5 +276,21 @@ if __name__ == "__main__":
         else:
             # But on windows with python 3.10 gives depreciation warning and wants this
             asyncio.run(p.start())
+    except KeyboardInterrupt:
+        logging.error('\n\nExiting due to KeyboardInterrupt\n')
+        p.lights = [(0,0,0) for i in range(0,len(p.lights))]
+        if live:
+            p.lights.show()
     except Exception as e:
-        logging.error(f'Error stopped lights:\n{e}')
+        logging.exception(f'\n\nError {e.__class__} during lights:\n{e}')
+        exitWithError = True
+    
+    if exitWithError:
+        try:
+            p.lights = [(0,0,0) for i in range(0,len(p.lights))]
+            p.lights[0] = [(0,100,0)]
+            print(p.lights)
+            if live:
+                p.lights.show()
+        except Exception as e:
+            logging.exception(f"Unable to play error lights:\n{e}")

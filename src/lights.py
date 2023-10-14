@@ -158,12 +158,23 @@ class Idle(LightSequence):
         super().__init__(lights, lRange, ship)
 
     def run(self):
-        """Fill section of the lights array with (0,0,0)"""
+        """Fill section of the lights array with OFF (0,0,0)"""
         if self.progress == 0:
             self.lights[self.lRange[0]:self.lRange[1]] = [(0,0,0) for i in range(self.lRange[0],self.lRange[1])]
             self.progress = 1
         return True
 
+
+class Error(LightSequence):
+    def __init__(self, lights, lRange, ship=None):
+        super().__init__(lights, lRange, ship)
+
+    def run(self):
+        """Fill section of the lights array with RED (0,100,0) GRB"""
+        if self.progress == 0:
+            self.lights[self.lRange[0]:self.lRange[1]] = [(0,100,0) for i in range(self.lRange[0],self.lRange[1])]
+            self.progress = 1
+        return True
 
 class Transmission(LightSequence):
     """Sequence that plays for the signal"""
@@ -507,6 +518,9 @@ class Img(LightSequence):
     def __init__(self, lights, lRange, theme, filename, ship=None):
         super().__init__(lights, lRange, ship)
         self.stop = not self.openImg(theme + '/' + filename + '.png')
+        
+        if self.stop:
+            logging.error(f"unable to load {filename} from {theme}")
     
     def run(self):
         return self.playImg()
