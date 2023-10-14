@@ -34,8 +34,17 @@ class DSNQuery:
     
     def poll(self):
         """Ask DSN Now whats up and return the data"""
-        dishxml = requests.get('https://eyes.nasa.gov/dsn/data/dsn.xml')
-    
+        signals = {}
+
+        try:
+            dishxml = requests.get('https://eyes.nasa.gov/dsn/data/dsn.xml')
+        except requests.exceptions.ConnectionError as e:
+            logging.error("Unable to reach eyes.nasa.gov.")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Other requests error:\n {e}")
+        finally:
+            return signals
+
         # Get the actual xml object to work with
         comms = ET.fromstring(dishxml.text)
 
@@ -43,7 +52,7 @@ class DSNQuery:
         # find all down and upsignals
         # add each found spaceship and power/frequency to a list
         # translate shortnames to friendlynames
-        signals = {}
+        
 
         for dish in comms.findall('./dish'):
             for target in dish.findall('./target'):
