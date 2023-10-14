@@ -271,10 +271,13 @@ if __name__ == "__main__":
 
     # start the job.
     # this is a blocking call and will not move forward until finished
-    if live:
-        # For some reason this is required on the rpi??
-        # python 3.7
-        asyncio.get_event_loop().run_until_complete(p.start())
-    else:
-        # But on windows with python 3.10 gives depreciation warning and wants this
-        asyncio.run(p.start())
+    try:
+        if live:
+            # For some reason this is required on the rpi??
+            # python 3.7
+            asyncio.get_event_loop().run_until_complete(p.start())
+        else:
+            # But on windows with python 3.10 gives depreciation warning and wants this
+            asyncio.run(p.start())
+    except Exception as e:
+        logging.error(f'Error stopped lights:\n{e}')

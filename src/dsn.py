@@ -40,10 +40,11 @@ class DSNQuery:
             dishxml = requests.get('https://eyes.nasa.gov/dsn/data/dsn.xml')
         except requests.exceptions.ConnectionError as e:
             logging.error("Unable to reach eyes.nasa.gov.")
+            return signals
         except requests.exceptions.RequestException as e:
             logging.error(f"Other requests error:\n {e}")
-        finally:
             return signals
+            
 
         # Get the actual xml object to work with
         comms = ET.fromstring(dishxml.text)

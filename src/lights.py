@@ -383,6 +383,9 @@ class Ground(LightSequence):
     
     def updateDay(self,offset=0):
         """Pull down new sunrise and sunset times"""
+        # some defaults to stop it from crashing...
+        self.sunrise = datetime.now().replace(hour=7)
+        self.sunset = datetime.now().replace(hour=19)
 
         # use LOCAL day to ask the api
         endpoint = 'https://api.sunrise-sunset.org/json'
@@ -393,12 +396,20 @@ class Ground(LightSequence):
             'formatted':0
         }
 
-        r = requests.get(endpoint,params=data,verify=False)
+        try:
+            r = requests.get(endpoint,params=data,verify=False)
+        except requests.exceptions.ConnectionError as e:
+            logging.error("Unable to reach api.sunrise-sunset.org")
+            return
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Other requests error:\n {e}")
+            return
+        
         sundata = json.loads(r.content.decode('UTF-8'))
 
         # parse as some simple representation
         # convert from UTC to current time
-        sunrise = datetime.fromisoformat(sundata['results']['sunrise'])
+        #sunrise = datetime.fromisoformat(sundata['results']['sunrise'])
 
         # get the things
         self.sunrise = datetime.fromisoformat(sundata['results']['civil_twilight_begin'])
