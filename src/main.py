@@ -146,17 +146,19 @@ class Pulse:
     async def handle_client(self,reader,writer):
         global lights_on_override
         message = await reader.read(1024)
+        logging.debug(f'tcp rcv: {message}')
+        m = message.decode().strip()
 
-        if message == b'ON':
+        if m == 'ON':
             logging.debug("tcp command: ON")
             lights_on_override = True
             writer.write(b'OK')
-        elif message == b'OFF':
+        elif m == 'OFF':
             logging.debug("tcp command: OFF")
             lights_on_override = False
             writer.write(b'OK')
         else:
-            logging.debug(f"tcp command: bad: {message}")
+            logging.debug(f"tcp command: bad")
             writer.write(b'BAD CMD')
         
         await writer.drain()
