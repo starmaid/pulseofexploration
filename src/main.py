@@ -329,7 +329,9 @@ if __name__ == "__main__":
             asyncio.run(p.start())
     except KeyboardInterrupt:
         logging.error('\n\nExiting due to KeyboardInterrupt\n')
-        p.lights = [(0,0,0) for i in range(0,len(p.lights))]
+        # must modify in place! or else lights will break
+        for i in range(len(p.lights)):
+            p.lights[i] = (0,0,0)
         if live:
             p.lights.show()
     except Exception as e:
