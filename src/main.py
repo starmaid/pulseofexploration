@@ -32,6 +32,10 @@ else:
 import dsn
 import lights
 
+# one global variable
+# its set in one location and read in another. thread safe.
+lights_on_override = True
+
 class Pulse:
     def __init__(self):
         """Sets up the config, lights array, and the async queue"""
@@ -56,6 +60,11 @@ class Pulse:
             self.themeName = self.config['theme']
             self.lat = self.config['latitude']
             self.lng = self.config['longitude']
+            self.netswitch = self.config['expose_net_switch']
+            if self.netswitch:
+                self.netswitch_port = self.config['expose_net_port']
+            else:
+                self.netswitch_port  = None
         except Exception as e:
             logging.error('Value not found in config file: ' + str(e))
             logging.error('Stopping Program')
@@ -128,10 +137,44 @@ class Pulse:
                 self.runDsn(self.queue),
                 self.runSequenceQueue(self.queue),
                 self.runLights(self.queue),
+                self.runSwitchServer(),
                 return_exceptions=False
                 )
         
         return
+    
+    async def handle_client(self,reader,writer):
+        global lights_on_override
+        message = await reader.read(1024)
+
+        if message == b'ON':
+            logging.debug("tcp command: ON")
+            lights_on_override = True
+            writer.write(b'OK')
+        elif message == b'OFF':
+            logging.debug("tcp command: OFF")
+            lights_on_override = False
+            writer.write(b'OK')
+        else:
+            logging.debug(f"tcp command: bad: {message}")
+            writer.write(b'BAD CMD')
+        
+        await writer.drain()
+        writer.close()
+        await writer.wait_closed()
+
+
+    async def runSwitchServer(self):
+        if not self.netswitch:
+            return
+        self.server = await asyncio.start_server(
+            self.handle_client, 
+            '', 
+            self.netswitch_port)
+        
+        async with self.server:
+            await self.server.serve_forever()
+        
 
     async def runDsn(self, queue):
         """handles periodically updating from dsn now
@@ -212,7 +255,7 @@ class Pulse:
                     except:
                         pass
                     self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
-                    print('\nNew sequence')
+                    #print('\nNew sequence')
                     # set the sky as the new sky
                     # set the signal parameters and add
             
@@ -225,6 +268,8 @@ class Pulse:
         """Runs the lights thread. Ideally refreshes the lights quickly (0.1s)"""
 
         running = True
+
+        global lights_on_override
 
         while running:
             if True in [s.stop for s in self.activeSequences]:
@@ -243,11 +288,17 @@ class Pulse:
                 self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
                 logging.debug('End of sky sequence')
 
+            if not lights_on_override:
+                #logging.debug('blocked by udp packet switch')
+                # do not replace reference to self.lights! modify in place
+                for i in range(len(self.lights)):
+                    self.lights[i] = (0,0,0)
+
             if live:
                 self.lights.show()
             else:
                 # Turn the lights into a 0-9 scale of brightness
-                allL = [int(sum(self.lights[a])/3/25.6) for a in range(0,len(self.lights))]
+                allL = [int(sum(a)/3/25.6) for a in self.lights]
                 allLString = ''
                 for l in allL:
                     allLString += str(l)

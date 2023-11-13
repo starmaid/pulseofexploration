@@ -11,5 +11,7 @@
     "framerate": 10,
     "theme": "Default",
     "latitude": 37.77,
-    "longitude": -122.41
+    "longitude": -122.41,
+    "expose_net_switch": false,
+    "expose_net_port": 9996
 }
