@@ -147,7 +147,7 @@ class Pulse:
         global lights_on_override
         message = await reader.read(1024)
         logging.debug(f'tcp rcv: {message}')
-        m = message.decode().strip()
+        m = message.decode().strip().upper()
 
         if m == 'ON':
             logging.debug("tcp command: ON")
@@ -157,6 +157,11 @@ class Pulse:
             logging.debug("tcp command: OFF")
             lights_on_override = False
             writer.write(b'OK')
+        elif m == 'STATUS':
+            if lights_on_override:
+                writer.write(b'ON')
+            else:
+                writer.write(b'OFF')
         else:
             logging.debug(f"tcp command: bad")
             writer.write(b'BAD CMD')
