@@ -12,6 +12,28 @@ This pulls data from [JPL Eyes DSN.](https://eyes.nasa.gov/dsn/dsn.html). This i
 
 This project uses [Adafruit CircuitPython](https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/overview). WS2812 light strips and [their python library from adafruit](https://learn.adafruit.com/neopixels-on-raspberry-pi/python-usage). This project uses [the sunrise-sunset API](https://sunrise-sunset.org/api) for automatic day/night modes.
 
+## NEW: Home Assistant Intgration!
+
+My last series of updates add the ability to remotely turn on and off the lights, without having to log into the pi, or pull any plugs. These commands can be run from a computer on the same network, or you can add them to a home automation suite like [Home Assistant](https://www.home-assistant.io/). First you have to enable the port in your Pulse's `config.json` file:
+
+```json
+    "expose_net_switch": true,
+    "expose_net_port": 9996
+```
+
+And then add this section to your Home Assistant `configuration.yaml`: 
+
+```yaml
+command_line:
+  - switch:
+        name: The Pulse
+        unique_id: pulse_of_exploration 
+        command_on: 'echo "ON" | nc dsn.local 9996'
+        command_off: 'echo "OFF" | nc dsn.local 9996'
+        command_state: 'echo "STATUS" | nc dsn.local 9996'
+        value_template: '{{ value == "ON" }}'
+```
+
 ## Who made these animation themes?
 
 Check out the README files in each theme folder!
