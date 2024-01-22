@@ -31,7 +31,7 @@ class DSNQuery:
         for ship in allships:
             self.friendlyTranslator[ship.attrib['name']] = ship.attrib['friendlyName']
 
-    
+
     def poll(self):
         """Ask DSN Now whats up and return the data"""
         signals = {}
@@ -89,12 +89,18 @@ class DSNQuery:
                                 sDict['up_frequency'] = float(signal.attrib['frequency'])
                             except ValueError:
                                 sDict['up_frequency'] = None
+
+                            try:
+                                sDict['up_band'] = signal.attrib['band']
+                            except:
+                                sDict['up_band'] = None
                             
                 if 'up' not in sDict.keys():
                     sDict['up'] = False
                     sDict['up_power'] = None
                     sDict['up_dataRate'] = None
                     sDict['up_frequency'] = None
+                    sDict['up_band'] = None
                 
                 for signal in dish.findall('./downSignal'):
                     if signal.attrib['signalType'] != 'none':
@@ -115,11 +121,17 @@ class DSNQuery:
                             except ValueError:
                                 sDict['down_frequency'] = None
                         
+                            try:
+                                sDict['down_band'] = signal.attrib['band']
+                            except:
+                                sDict['down_band'] = None
+
                 if 'down' not in sDict.keys():
                     sDict['down'] = False
                     sDict['down_power'] = None
                     sDict['down_dataRate'] = None
                     sDict['down_frequency'] = None
+                    sDict['down_band'] = None
                 
                 if (not sDict['down']) and (not sDict['up']):
                     continue

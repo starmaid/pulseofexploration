@@ -203,6 +203,14 @@ class Transmission(LightSequence):
         else:
             self.rtlt = self.ship['rtlt']
 
+        
+        # turn band name into frequency 'number' for displaying
+        # S ~ 2000 MHz
+        # X ~ 8000 MHz
+        # K ~ 76000 MHz
+        # Ka ~ 32000 MHz
+
+        band_conversion = {'S':1, 'X':4, 'K':8, 'Ka':10}
 
         if self.dir in ['down', 'both']:
             # Power reported in dBm
@@ -216,8 +224,13 @@ class Transmission(LightSequence):
                     self.power = 1
             
             # Frequency in MHz
-            if 'down_frequency' in self.ship.keys() and self.ship['down_frequency'] is not None:
+            if ('down_frequency' in self.ship.keys() 
+                and self.ship['down_frequency'] is not None 
+                and self.ship['down_frequency']>10):
                 self.frequency = self.ship['down_frequency'] / 1000000000
+            elif ('down_band' in self.ship.keys()
+                and self.ship['down_band'] is not None):
+                self.frequency = band_conversion[self.ship['down_band']]
             else:
                 self.frequency = 8
 
@@ -229,10 +242,16 @@ class Transmission(LightSequence):
                 self.power = self.ship['up_power'] * 1000
             
             # Frequency in GHz
-            if 'up_frequency' in self.ship.keys() and self.ship['up_frequency'] is not None:
+            if ('up_frequency' in self.ship.keys() 
+                and self.ship['up_frequency'] is not None 
+                and self.ship['up_frequency']>10):
                 self.frequency = self.ship['up_frequency'] / 1000
-            else: 
+            elif ('up_band' in self.ship.keys()
+                and self.ship['up_band'] is not None):
+                self.frequency = band_conversion[self.ship['up_band']]
+            else:
                 self.frequency = 4
+
         else:
             self.power = 1000
             self.frequency = 5
