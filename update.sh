@@ -23,7 +23,7 @@ cp $CFILE $CFILE".clean"
 
 # Move the old config file back into place
 cp $CFILED $CFILE
-mv -f $CFILED CFILEDN
+mv -f $CFILED $CFILEDN
 
 # Make sure run is executable
 chmod +x ./run.sh
