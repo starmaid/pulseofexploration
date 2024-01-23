@@ -135,11 +135,26 @@ class DSNQuery:
                 
                 if (not sDict['down']) and (not sDict['up']):
                     continue
-
+                
                 sDict['range'] = float(target.attrib['uplegRange']) # in km
                 sDict['rtlt'] = float(target.attrib['rtlt']) # in seconds
                 sDict['dish'] = dish.attrib['name']
-                signals[name] = sDict
+                
+
+                # add logic to ignore signals that arent ready
+                # a signal needs to have rtlt, power, band||frequnency
+                if sDict['up']:
+                    ds = 'up_'
+                else:
+                    ds = 'down_'
+
+                if (sDict['rtlt'] 
+                    and sDict[f'{ds}power']
+                    and (sDict[f'{ds}frequency'] or sDict[f'{ds}band'])):
+                    signals[name] = sDict
+                    logging.debug("signal {name} has all valid fields.")
+                else:
+                    logging.debug("signal {name} not ready.")
         
         # Remove things we dont care about
         # Mind control voice: KILL TESTING
@@ -165,10 +180,14 @@ class DSNQuery:
         # Add any new signal we just saw to the active ones
         for s in signals.keys():
             if s not in self.activeSignals.keys():
+                # if the key isnt found, add to both lists.
                 newsignals[s] = signals[s]
                 self.activeSignals[s] = signals[s]
             else:
-                if len(signals[s]) != len(self.activeSignals[s]):
+                # if the key is there, the signal info may have changed
+                # hopefully this will play downlink signals now :)
+                if ((signals[s]['up'] != self.activeSignals[s]['up'])
+                    or (signals[s]['down'] != self.activeSignals[s]['down'])):
                     newsignals[s] = signals[s]
                     self.activeSignals[s] = signals[s]
         
