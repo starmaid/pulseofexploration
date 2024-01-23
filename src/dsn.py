@@ -152,9 +152,9 @@ class DSNQuery:
                     and sDict[f'{ds}power']
                     and (sDict[f'{ds}frequency'] or sDict[f'{ds}band'])):
                     signals[name] = sDict
-                    logging.debug("signal {name} has all valid fields.")
+                    #logging.debug(f"signal {name} has all valid fields.")
                 else:
-                    logging.debug("signal {name} not ready.")
+                    logging.debug(f"signal {name} not ready.")
         
         # Remove things we dont care about
         # Mind control voice: KILL TESTING
