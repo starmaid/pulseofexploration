@@ -427,7 +427,7 @@ class Ground(LightSequence):
         }
 
         try:
-            r = requests.get(endpoint,params=data,verify=False)
+            r = requests.get(endpoint,params=data,verify=True)
         except requests.exceptions.ConnectionError as e:
             logging.error("Unable to reach api.sunrise-sunset.org")
             return
