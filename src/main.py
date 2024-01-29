@@ -112,6 +112,8 @@ class Pulse:
             self.lights = [(0,0,0)] * sum(numLeds)
 
         # Tuple ranges for each section so we can pass them to sequences
+        # always increasing (first element < second element)
+        # first inclusing, second exclusive
         if self.groundfirst:
             self.ground = (0, numLeds[0])
             self.signal = (numLeds[0], numLeds[0]+numLeds[1])
@@ -247,25 +249,29 @@ class Pulse:
 
         running = True
 
+        self.sequencePlaying = False
+
         while running:
             # Reads the commands in the queue
             # If the queue is currently empty, it will wait for the next item to be added.
-            obj = await queue.get()
-            if obj is not None:
-                if obj.stop:
-                    running = False
-                    self.activeSequences = [obj,obj,obj]
-                else:
-                    self.activeSequences[2] = obj
-                    try:
-                        pass
-                        #print(obj.ship['up_power'])
-                    except:
-                        pass
-                    self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
-                    #print('\nNew sequence')
-                    # set the sky as the new sky
-                    # set the signal parameters and add
+            if not self.sequencePlaying:
+                obj = await queue.get()
+                if obj is not None:
+                    if obj.stop:
+                        running = False
+                        self.activeSequences = [obj,obj,obj]
+                    else:
+                        self.sequencePlaying = True
+                        self.activeSequences[2] = obj
+                        try:
+                            pass
+                            #print(obj.ship['up_power'])
+                        except:
+                            pass
+                        self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
+                        #print('\nNew sequence')
+                        # set the sky as the new sky
+                        # set the signal parameters and add
             
             # Because this is just placing different objects in the queue
             # It can run at a lower clock speed than the framerate
@@ -290,6 +296,7 @@ class Pulse:
             if not cont:
                 self.activeSequences[1] = lights.Idle(self.lights,self.signal)
                 logging.debug('End of signal sequence')
+                self.sequencePlaying = False
 
             cont = self.activeSequences[2].run()
             if not cont:

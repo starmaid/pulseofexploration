@@ -288,8 +288,10 @@ class Transmission(LightSequence):
             self.progress += 1
             return True
         
+        # the number of timesteps we are into the animation
         progadj = int(self.progress / self.delay)
 
+        # d is the direction - if positive, increasing led index as animation plays
         if self.groundfirst:
             d = 1
         else:
@@ -297,11 +299,45 @@ class Transmission(LightSequence):
         
         if self.dir != 'up':
             d = d * -1
-        
-        apos = {}
+
+        apos = {} # adjusted position of lights. 
+        # keys are the actual index of lights on the hardware. (lRange[0] to lRange[1])
+        # values are the color of the lights for this timestep
         for i in range(0,len(self.lset)):
             # for every item in the pattern, hash the color at the location it will display.
-            apos[self.lRange[0 if d < 0 else 1] - d*progadj + d*i] = self.lset[i]
+            # as propadj goes from 0 to len(lset)
+            # apos stays having (lRange[0] to lRange[1])
+            # and the lights go from one end to the other
+            """
+            up
+            apos[lrange[0]] = lset[0]
+            apos[lrange[0] + 1] = nothing
+
+            down
+            apos[lrange[1] - 1] = lset[0]
+            apos[lrange[1] - 2] = nothing
+            apos[lrange[1] - 3] = nothing
+
+            apos[lrange[1] - 1] = lset[1]
+            apos[lrange[1] - 2] = lset[0]
+            apos[lrange[1] - 3] = nothing
+            
+            """
+            # start at bottom or top
+            if d > 0:
+                startLed = self.lRange[0]
+            else:
+                startLed = self.lRange[1] - 1
+
+            # as propadj increases, move up or down
+            modifier = d*progadj
+
+            # as i increases, move down or up
+            imod = d*i * -1 
+
+            #       9   +       0   +   0               0
+            #       9   +       -1  +   0               0 
+            apos[startLed + modifier + imod] = self.lset[i]
 
         done = True
         for i in range(self.lRange[0],self.lRange[1]):
