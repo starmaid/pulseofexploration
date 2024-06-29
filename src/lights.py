@@ -229,7 +229,8 @@ class Transmission(LightSequence):
                 and self.ship['down_frequency']>10):
                 self.frequency = self.ship['down_frequency'] / 1000000000
             elif ('down_band' in self.ship.keys()
-                and self.ship['down_band'] is not None):
+                and self.ship['down_band'] is not None
+                and self.ship['down_band'] != ''):
                 self.frequency = band_conversion[self.ship['down_band']]
             else:
                 self.frequency = 8
@@ -247,7 +248,8 @@ class Transmission(LightSequence):
                 and self.ship['up_frequency']>10):
                 self.frequency = self.ship['up_frequency'] / 1000
             elif ('up_band' in self.ship.keys()
-                and self.ship['up_band'] is not None):
+                and self.ship['up_band'] is not None
+                and self.ship['up_band'] != ''):
                 self.frequency = band_conversion[self.ship['up_band']]
             else:
                 self.frequency = 4
