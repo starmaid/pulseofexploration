@@ -20,7 +20,8 @@ class DSNQuery:
 
     def getFriendlyNames(self):
         # get friendly names
-        friendlyxml = requests.get('https://eyes.nasa.gov/dsn/config.xml')
+        #friendlyxml = requests.get('https://eyes.nasa.gov/dsn/config.xml')
+        friendlyxml = requests.get('https://eyes.nasa.gov/apps/dsn-now/config.xml') # those fuckers changed it??? 2024/10/18 ish
         parser = ET.XMLParser(encoding='UTF-8')
         friendlynames = ET.fromstring(friendlyxml.text, parser=parser)
         
