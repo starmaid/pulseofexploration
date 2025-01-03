@@ -464,8 +464,8 @@ class Ground(LightSequence):
     def updateDay(self,offset=0):
         """Pull down new sunrise and sunset times"""
         # some defaults to stop it from crashing...
-        self.sunrise = datetime.now().replace(hour=7)
-        self.sunset = datetime.now().replace(hour=19)
+        self.sunrise = datetime.now().astimezone().replace(hour=7)
+        self.sunset = datetime.now().astimezone().replace(hour=19)
 
         # use LOCAL day to ask the api
         endpoint = 'https://api.sunrise-sunset.org/json'
