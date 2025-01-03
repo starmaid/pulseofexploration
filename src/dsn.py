@@ -43,13 +43,17 @@ class DSNQuery:
             logging.error("Unable to reach eyes.nasa.gov.")
             return signals
         except requests.exceptions.RequestException as e:
-            logging.error(f"Other requests error:\n {e}")
+            logging.error(f"Other requests error:\n{e}")
             return signals
             
 
         # Get the actual xml object to work with
-        comms = ET.fromstring(dishxml.text)
-
+        try:
+            comms = ET.fromstring(dishxml.text)
+        except ET.ParseError as e:
+            logging.warning(f"dsn signals XML Parse Error:\n{e}")
+            return signals
+        
         # Go through each dish
         # find all down and upsignals
         # add each found spaceship and power/frequency to a list
