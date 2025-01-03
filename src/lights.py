@@ -61,11 +61,17 @@ class LightSequence:
         think about it"""
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
         
+        try:
+            y = int(y)
+        except ValueError:
+            y = 0
+        
         if y < outMin:
             y = outMin
         if y > outMax:
             y = outMax
-        return int(y)
+        
+        return y
 
     def logmap(self, x, inMin, inMax, outMin, outMax):
         """This is the map() function from Arduino. 
@@ -80,11 +86,17 @@ class LightSequence:
 
         y = (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
         
+        try:
+            y = int(y)
+        except ValueError:
+            y = 0
+        
         if y < outMin:
             y = outMin
         if y > outMax:
             y = outMax
-        return int(y)
+        
+        return y
     
     def noisepx(self, px, rx):
         """apply addative RGB color noise 
