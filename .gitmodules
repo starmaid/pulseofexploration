@@ -1,0 +1,3 @@
+[submodule "src/lights"]
+	path = src/lights
+	url = https://github.com/starmaid/lights.git
