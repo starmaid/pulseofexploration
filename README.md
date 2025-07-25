@@ -12,7 +12,13 @@ This pulls data from [JPL Eyes DSN.](https://eyes.nasa.gov/dsn/dsn.html). This i
 
 This project uses [Adafruit CircuitPython](https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/overview). WS2812 light strips and [their python library from adafruit](https://learn.adafruit.com/neopixels-on-raspberry-pi/python-usage). This project uses [the sunrise-sunset API](https://sunrise-sunset.org/api) for automatic day/night modes.
 
-## NEW: Home Assistant Intgration!
+## NEW (Summer 2025): WLED Integration!
+
+Set your new config value `"lights_type": "WledLightStrip"` and set your IP address, and you can play your favorite pulse of exploration animations on any existing WLED lightstrip using the UDP realtime mode. Your on/off state and brightness level from WLED still work, but now the animation can come from your PC running the program! Free up that raspberry pi that was tied to a lights display, that was totally overkill. 
+
+If people want to use this, I may set up a docker container that you can just launch as part of your own home cluster.
+
+## NEW (Summer 2024): Home Assistant Intgration!
 
 My last series of updates add the ability to remotely turn on and off the lights, without having to log into the pi, or pull any plugs. These commands can be run from a computer on the same network, or you can add them to a home automation suite like [Home Assistant](https://www.home-assistant.io/). First you have to enable the port in your Pulse's `config.json` file:
 

@@ -14,23 +14,22 @@ logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 # Determine if we should enter live or debug mode
 if 'arm' in platform.machine():
+    arm = True
     # Then we are running on a board that can do lights. probably
-    live = True
-    import board
-    import neopixel
     logfilename = str(datetime.now())[0:10] + '.log'
     logging.basicConfig(filename=logfilename, format='%(asctime)s %(levelname)s %(message)s', level=logging.WARNING)
-    print('Starting lights in live mode')
-    logging.warning('Starting lights in live mode')
+    print('Running on ARM CPU, likely raspberry pi')
+    logging.warning('Running on ARM CPU')
 else:
+    arm = False
     # Then we are probably not running on a RPi.
-    live = False
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-    print('Starting lights in test mode')
+    logging.warning('Not running on ARM CPU')
 
 # Custom modules
 import dsn
-import lights
+import lights_patterns as lights_patterns
+from lights.lights import NeopixelRPILightStrip, WledLightStrip, PrintTestLightStrip
 
 # one global variable
 # its set in one location and read in another. thread safe.
@@ -52,7 +51,12 @@ class Pulse:
         try:
             # Loading all values from config
             self.lightsegments = self.config['lights']
-            self.pin = self.config['pin']
+            self.lights_type = self.config['lights_type']
+            if self.lights_type not in self.config['_lights_type_options']:
+                raise ValueError(f"Lights type {self.lights_type} not a valid option.")
+
+            self.neopixel_pin = self.config['Neopixel_pin']
+            self.wled_ip = self.config['Wled_IP']
             self.brightness = self.config['brightness']
             self.rgbw = self.config['RGBW']
             self.groundfirst = self.config['groundFirst']
@@ -89,27 +93,24 @@ class Pulse:
         numLeds = [self.lightsegments[a] for a in ['ground', 'signal', 'sky']]
         
         # Set up LED control, if we are live
-        global live
-        if live:
+        self.lights_strip = [(0,0,0)] * sum(numLeds)
+        if self.lights_type == "NeopixelRPILightStrip":
             if self.rgbw:
-                order = neopixel.GRBW
+                order = "GRBW"
             else:
-                order = neopixel.GRB
+                order = "GRB"
             try:
-                if self.pin not in [18,19,20,21]:
-                    raise Exception('Selected pin does not support PCM. See pinout and modify config.')
-
-                pinname = getattr(board,'D'+str(self.pin))
-                self.lights = neopixel.NeoPixel(pinname, sum(numLeds), 
-                        brightness=self.brightness, auto_write=False, 
-                        pixel_order=order)
+                
+                self.lights_object = NeopixelRPILightStrip(sum(numLeds), self.neopixel_pin, order, self.brightness)
             except Exception as e:
                 logging.error('Error setting up lights: ' + str(e))
                 logging.error('Stopping Program')
                 raise e
-        else:
-            # If we arent live, lets just use an array of tuples.
-            self.lights = [(0,0,0)] * sum(numLeds)
+        elif self.lights_type == "PrintTestLightStrip":
+            self.lights_object = PrintTestLightStrip(sum(numLeds))
+        elif self.lights_type == "WledLightStrip":
+            self.lights_object = WledLightStrip(sum(numLeds),self.wled_ip)
+
 
         # Tuple ranges for each section so we can pass them to sequences
         # always increasing (first element < second element)
@@ -209,19 +210,19 @@ class Pulse:
 
                             try:
                                 # Attempt to load the class from lights.py
-                                classname = getattr(lights,locname)
-                                newSequence = classname(self.lights, self.sky, ship=q.activeSignals[s])
+                                classname = getattr(lights_patterns,locname)
+                                newSequence = classname(self.lights_strip, self.sky, ship=q.activeSignals[s])
                                 logging.debug('Found LightSequence class ', classname)
                             except AttributeError:
                                 # If that that class doesnt exist, load that image
                                 logging.debug('LightSequence Class not found. Loading image file')
-                                newSequence = lights.Img(self.lights, self.sky, 
+                                newSequence = lights_patterns.Img(self.lights_strip, self.sky, 
                                         self.themeName,locname,ship=q.activeSignals[s])
                             
 
                         else:
                             logging.debug('%s not found in config, loading DeepSpace',s)
-                            newSequence = lights.DeepSpace(self.lights,self.sky,ship=q.activeSignals[s])
+                            newSequence = lights_patterns.DeepSpace(self.lights_strip,self.sky,ship=q.activeSignals[s])
 
                         await self.queue.put(newSequence)
 
@@ -231,7 +232,7 @@ class Pulse:
                 # Add the stop object
                 # TODO: this doesnt really work either
                 running = False
-                self.queue.put(lights.Stop())
+                self.queue.put(lights_patterns.Stop())
         return
 
     async def runSequenceQueue(self, queue):
@@ -243,9 +244,9 @@ class Pulse:
         """
 
         # Set the startup running sequences
-        self.activeSequences = [lights.Ground(self.lights,self.ground,self.lat,self.lng), 
-                            lights.Idle(self.lights,self.signal), 
-                            lights.IdleSky(self.lights,self.sky)]
+        self.activeSequences = [lights_patterns.Ground(self.lights_strip,self.ground,self.lat,self.lng), 
+                            lights_patterns.Idle(self.lights_strip,self.signal), 
+                            lights_patterns.IdleSky(self.lights_strip,self.sky)]
 
         running = True
 
@@ -268,7 +269,7 @@ class Pulse:
                             #print(obj.ship['up_power'])
                         except:
                             pass
-                        self.activeSequences[1] = lights.Transmission(self.lights,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
+                        self.activeSequences[1] = lights_patterns.Transmission(self.lights_strip,self.signal,ship=obj.ship,groundfirst=self.groundfirst)
                         #print('\nNew sequence')
                         # set the sky as the new sky
                         # set the signal parameters and add
@@ -294,31 +295,22 @@ class Pulse:
 
             cont = self.activeSequences[1].run()
             if not cont:
-                self.activeSequences[1] = lights.Idle(self.lights,self.signal)
+                self.activeSequences[1] = lights_patterns.Idle(self.lights_strip,self.signal)
                 logging.debug('End of signal sequence')
                 self.sequencePlaying = False
 
             cont = self.activeSequences[2].run()
             if not cont:
-                self.activeSequences[2] = lights.IdleSky(self.lights,self.sky)
+                self.activeSequences[2] = lights_patterns.IdleSky(self.lights_strip,self.sky)
                 logging.debug('End of sky sequence')
 
             if not lights_on_override:
                 #logging.debug('blocked by udp packet switch')
-                # do not replace reference to self.lights! modify in place
-                for i in range(len(self.lights)):
-                    self.lights[i] = (0,0,0)
+                # do not replace reference to self.lights_strip! modify in place
+                for i in range(len(self.lights_strip)):
+                    self.lights_strip[i] = (0,0,0)
 
-            if live:
-                self.lights.show()
-            else:
-                # Turn the lights into a 0-9 scale of brightness
-                allL = [int(sum(a)/3/25.6) for a in self.lights]
-                allLString = ''
-                for l in allL:
-                    allLString += str(l)
-
-                print(allLString + '\r',end='')
+            self.lights_object.setLights(self.lights_strip)
             
             # Wait frame time to refresh lights
             await asyncio.sleep(self.framedelay)
@@ -335,7 +327,7 @@ if __name__ == "__main__":
     # start the job.
     # this is a blocking call and will not move forward until finished
     try:
-        if live:
+        if arm:
             # For some reason this is required on the rpi??
             # python 3.7
             asyncio.get_event_loop().run_until_complete(p.start())
@@ -345,20 +337,18 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logging.error('\n\nExiting due to KeyboardInterrupt\n')
         # must modify in place! or else lights will break
-        for i in range(len(p.lights)):
-            p.lights[i] = (0,0,0)
-        if live:
-            p.lights.show()
+        for i in range(len(p.lights_strip)):
+            p.lights_strip[i] = (0,0,0)
+        p.lights_object.setLights(p.lights_strip)
     except Exception as e:
         logging.exception(f'\n\nError {e.__class__} during lights:\n{e}')
         exitWithError = True
     
     if exitWithError:
         try:
-            p.lights = [(0,0,0) for i in range(0,len(p.lights))]
-            p.lights[0] = [(0,100,0)]
-            print(p.lights)
-            if live:
-                p.lights.show()
+            p.lights_strip = [(0,0,0) for i in range(0,len(p.lights_strip))]
+            p.lights_strip[0] = (0,100,0)
+            print(p.lights_strip)
+            p.lights_object.setLights(p.lights_strip)
         except Exception as e:
             logging.exception(f"Unable to play error lights:\n{e}")

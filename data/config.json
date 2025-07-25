@@ -1,10 +1,17 @@
 {
     "lights": {
-        "ground": 10,
-        "signal": 10,
-        "sky": 10
+        "ground": 20,
+        "signal": 60,
+        "sky": 40
     },
-    "pin": 18,
+    "lights_type": "WledLightStrip",
+    "_lights_type_options": [
+        "WledLightStrip",
+        "NeopixelRPILightStrip",
+        "PrintTestLightStrip"
+    ],
+    "Neopixel_pin": 18,
+    "Wled_IP": "192.168.0.21",
     "brightness": 50,
     "RGBW": false,
     "groundFirst": true,
